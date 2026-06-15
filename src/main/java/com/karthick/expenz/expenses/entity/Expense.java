@@ -8,7 +8,8 @@ import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "expenses")
+@Entity
+@Table(name = "expenses")
 @Getter
 @Setter
 public class Expense implements Serializable {
@@ -29,8 +30,8 @@ public class Expense implements Serializable {
   @Column(name = "category", nullable = false)
   private String category;
 
-  @Column(name = "is_it_income", nullable = false)
-  private boolean isItIncome;
+  @Column(name = "is_income", nullable = false)
+  private boolean isIncome;
 
   @Column(name = "date_added", nullable = false)
   private Date dateAdded;

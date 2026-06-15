@@ -1,5 +1,6 @@
 package com.karthick.expenz.expenses.controller;
 
+import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.service.ExpenseService;
 import com.karthick.expenz.security.UserSession;
@@ -12,14 +13,14 @@ import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/expense")
+@RequestMapping("/api/expense")
 public class ExpensesController {
 
   private ExpenseService expenseService;
   private UserSession userSession;
 
   @GetMapping("/all")
-  public ResponseEntity<List<Expense>> getAllExpenses() {
+  public ResponseEntity<List<ExpenseDTO>> getAllExpenses() {
     return new ResponseEntity<>(
       expenseService.fetchAllExpenses(userSession.getAuthenticatedUserId()),
       HttpStatus.OK
@@ -27,7 +28,7 @@ public class ExpensesController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Expense>> getAllExpensesByMonthAndYear(
+  public ResponseEntity<List<ExpenseDTO>> getAllExpensesByMonthAndYear(
     @RequestParam int month,
     int year
   ) {
@@ -42,7 +43,7 @@ public class ExpensesController {
   }
 
   @GetMapping("/expenses")
-  public ResponseEntity<List<Expense>> getExpensesByMonthAndYear(
+  public ResponseEntity<List<ExpenseDTO>> getExpensesByMonthAndYear(
     @RequestParam int month,
     int year
   ) {
@@ -58,7 +59,7 @@ public class ExpensesController {
   }
 
   @GetMapping("/incomes")
-  public ResponseEntity<List<Expense>> getIncomesByMonthAndYear(
+  public ResponseEntity<List<ExpenseDTO>> getIncomesByMonthAndYear(
     @RequestParam int month,
     int year
   ) {
@@ -74,15 +75,17 @@ public class ExpensesController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Expense> getExpensesById(@PathVariable("id") long id) {
+  public ResponseEntity<ExpenseDTO> getExpensesById(
+    @PathVariable("id") long id
+  ) {
     return new ResponseEntity<>(
-      expenseService.findExpense(id, userSession.getAuthenticatedUserId()),
+      expenseService.findExpenseDTO(id, userSession.getAuthenticatedUserId()),
       HttpStatus.OK
     );
   }
 
   @PostMapping
-  public ResponseEntity<Expense> createNewExpense(
+  public ResponseEntity<ExpenseDTO> createNewExpense(
     @RequestBody Expense expense
   ) {
     return new ResponseEntity<>(
@@ -95,7 +98,7 @@ public class ExpensesController {
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<Expense> updateExpenseById(
+  public ResponseEntity<ExpenseDTO> updateExpenseById(
     @PathVariable("id") long id,
     @RequestBody Map<String, Object> newData
   ) {

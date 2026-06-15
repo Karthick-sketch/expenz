@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
+import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
 import com.karthick.expenz.expenses.service.ExpenseService;
@@ -42,7 +43,7 @@ public class ExpenseServiceTest {
     expense.setId(1);
     expense.setAmount(50_000.0);
     expense.setCategory("electronics");
-    expense.setItIncome(false);
+    expense.setIncome(false);
     expense.setTitle("Playstation 5");
     expense.setDescription("Play next generation games");
     expense.setDateAdded(date);
@@ -55,6 +56,16 @@ public class ExpenseServiceTest {
     expense.setUser(user);
 
     return expense;
+  }
+
+  private void assertExpenseEqualsDTO(Expense expense, ExpenseDTO dto) {
+    assertEquals(expense.getId(), dto.getId());
+    assertEquals(expense.getAmount(), dto.getAmount(), 0.001);
+    assertEquals(expense.getTitle(), dto.getTitle());
+    assertEquals(expense.getDescription(), dto.getDescription());
+    assertEquals(expense.getCategory(), dto.getCategory());
+    assertEquals(expense.isIncome(), dto.isIncome());
+    assertEquals(expense.getDateAdded(), dto.getDateAdded());
   }
 
   @Test
@@ -79,16 +90,38 @@ public class ExpenseServiceTest {
   }
 
   @Test
+  public void testFindExpenseDTOById() {
+    Expense mockExpense = getTestExpenseData();
+    when(expenseRepository.findById(mockExpense.getId())).thenReturn(
+      (Optional.of(mockExpense))
+    );
+
+    ExpenseDTO validExpense = expenseService.findExpenseDTO(
+      mockExpense.getId(),
+      mockExpense.getUser().getId()
+    );
+    Executable wrongId = () ->
+      expenseService.findExpenseDTO(2, mockExpense.getUser().getId());
+    Executable wrongUserId = () ->
+      expenseService.findExpenseDTO(mockExpense.getId(), 2);
+
+    assertExpenseEqualsDTO(mockExpense, validExpense);
+    assertThrows(EntityNotFoundException.class, wrongId);
+    assertThrows(EntityNotFoundException.class, wrongUserId);
+  }
+
+  @Test
   public void testFetchAllExpensesByUserId() {
     Expense mockExpense = getTestExpenseData();
     when(
       expenseRepository.findByUserId(mockExpense.getUser().getId())
     ).thenReturn(List.of(mockExpense));
 
-    List<Expense> validExpense = expenseService.fetchAllExpenses(
+    List<ExpenseDTO> validExpense = expenseService.fetchAllExpenses(
       mockExpense.getUser().getId()
     );
-    assertEquals(mockExpense, validExpense.get(0));
+    assertEquals(1, validExpense.size());
+    assertExpenseEqualsDTO(mockExpense, validExpense.get(0));
   }
 
   @Test
@@ -109,17 +142,13 @@ public class ExpenseServiceTest {
       )
     ).thenReturn(List.of(mockExpense));
 
-    List<Expense> validExpense = expenseService.fetchExpensesByMonthAndYear(
+    List<ExpenseDTO> validExpense = expenseService.fetchExpensesByMonthAndYear(
       month,
       year,
       mockExpense.getUser().getId()
     );
-    assertEquals(mockExpense, validExpense.get(0));
-
-    // not working, will fix it
-    // Executable notFoundUserId = () -> expenseService.fetchExpensesByMonthAndYear(month, year,
-    // SecurityConstants.NOT_FOUND);
-    // assertThrows(RuntimeException.class, notFoundUserId);
+    assertEquals(1, validExpense.size());
+    assertExpenseEqualsDTO(mockExpense, validExpense.get(0));
   }
 
   @Test
@@ -134,53 +163,44 @@ public class ExpenseServiceTest {
     Expense mockExpense = getTestExpenseData();
     when(
       expenseRepository.findExpensesByTypeMonthAndYear(
-        mockExpense.isItIncome(),
+        mockExpense.isIncome(),
         month,
         year,
         mockExpense.getUser().getId()
       )
     ).thenReturn(List.of(mockExpense));
 
-    List<Expense> validExpenses =
+    List<ExpenseDTO> validExpenses =
       expenseService.fetchExpensesByTypeMonthAndYear(
         false,
         month,
         year,
         mockExpense.getUser().getId()
       );
-    List<Expense> validIncomes = expenseService.fetchExpensesByTypeMonthAndYear(
+    List<ExpenseDTO> validIncomes = expenseService.fetchExpensesByTypeMonthAndYear(
       true,
       month,
       year,
       mockExpense.getUser().getId()
     );
-    assertEquals(mockExpense, validExpenses.get(0));
+    assertEquals(1, validExpenses.size());
+    assertExpenseEqualsDTO(mockExpense, validExpenses.get(0));
     assertTrue(validIncomes.isEmpty());
-
-    // not working, will fix it
-    // Executable notFoundUserId = () -> expenseService.fetchExpensesByMonthAndYear(month, year,
-    // SecurityConstants.NOT_FOUND);
-    // assertThrows(RuntimeException.class, notFoundUserId);
   }
 
   @Test
   public void testCreateNewExpense() {
     Expense mockExpense = getTestExpenseData();
+    when(userService.findUser(mockExpense.getUser().getId())).thenReturn(mockExpense.getUser());
     when(expenseRepository.save(mockExpense)).thenReturn(mockExpense);
 
-    Expense expense = expenseService.createExpense(
+    ExpenseDTO expense = expenseService.createExpense(
       mockExpense,
       mockExpense.getUser().getId()
     );
 
-    assertEquals(mockExpense, expense);
+    assertExpenseEqualsDTO(mockExpense, expense);
     verify(expenseRepository, times(1)).save(mockExpense);
-    /*
-     * # need to clarify how to pass invalid type to primitive types
-     * Executable invalidExpense = () ->
-     * expenseService.createNewExpense(mockExpense);
-     * assertThrows(BadRequestException.class, invalidExpense);
-     */
   }
 
   @Test
@@ -192,7 +212,7 @@ public class ExpenseServiceTest {
     when(expenseRepository.save(mockExpense)).thenReturn(mockExpense);
 
     Map<String, Object> updatedFields = Map.of("amount", 45_000.0);
-    Expense validExpense = expenseService.updateExpense(
+    ExpenseDTO validExpense = expenseService.updateExpense(
       mockExpense.getId(),
       updatedFields,
       mockExpense.getUser().getId()
@@ -214,7 +234,7 @@ public class ExpenseServiceTest {
         mockExpense.getUser().getId()
       );
 
-    assertEquals(mockExpense, validExpense);
+    assertExpenseEqualsDTO(mockExpense, validExpense);
     assertThrows(EntityNotFoundException.class, wrongId);
     assertThrows(EntityNotFoundException.class, wrongUserId);
     assertThrows(BadRequestException.class, invalidExpense);

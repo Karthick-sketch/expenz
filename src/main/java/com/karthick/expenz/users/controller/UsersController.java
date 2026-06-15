@@ -1,6 +1,7 @@
 package com.karthick.expenz.users.controller;
 
-import com.karthick.expenz.users.entity.User;
+import com.karthick.expenz.users.dto.UserCreateDTO;
+import com.karthick.expenz.users.dto.UserDTO;
 import com.karthick.expenz.users.service.UserService;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -9,19 +10,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @AllArgsConstructor
 public class UsersController {
 
   private UserService userService;
 
   @GetMapping("/{user-id}")
-  public ResponseEntity<User> getUserById(@PathVariable("user-id") long id) {
-    return new ResponseEntity<>(userService.findUser(id), HttpStatus.OK);
+  public ResponseEntity<UserDTO> getUserById(@PathVariable("user-id") long id) {
+    return new ResponseEntity<>(userService.findUserDTO(id), HttpStatus.OK);
   }
 
   @PostMapping("/register")
-  public ResponseEntity<User> createNewUser(@RequestBody User user) {
+  public ResponseEntity<UserDTO> createNewUser(
+    @RequestBody UserCreateDTO user
+  ) {
     return new ResponseEntity<>(
       userService.createUser(user),
       HttpStatus.CREATED
@@ -29,7 +32,7 @@ public class UsersController {
   }
 
   @PatchMapping("/{user-id}")
-  public ResponseEntity<User> updateUserById(
+  public ResponseEntity<UserDTO> updateUserById(
     @PathVariable("user-id") long id,
     @RequestBody Map<String, Object> updatedUser
   ) {

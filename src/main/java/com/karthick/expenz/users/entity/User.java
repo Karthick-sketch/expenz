@@ -7,7 +7,8 @@ import java.io.Serializable;
 import java.util.List;
 import lombok.*;
 
-@Entity(name = "users")
+@Entity
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -2,6 +2,7 @@ package com.karthick.expenz.expenses.service;
 
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
+import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
 import com.karthick.expenz.users.service.UserService;
@@ -32,43 +33,54 @@ public class ExpenseService {
     return expense.get();
   }
 
+  public ExpenseDTO findExpenseDTO(long id, long userId) {
+    return toExpenseDTO(findExpense(id, userId));
+  }
+
   @Cacheable(value = "expenses:user", key = "#userId")
-  public List<Expense> fetchAllExpenses(long userId) {
-    return expenseRepository.findByUserId(userId);
+  public List<ExpenseDTO> fetchAllExpenses(long userId) {
+    return expenseRepository
+      .findByUserId(userId)
+      .stream()
+      .map(this::toExpenseDTO)
+      .toList();
   }
 
   // not working, will fix it
   // @Cacheable(value = "expenses:user-month-year", key = "{#userId, #month, #year}")
-  public List<Expense> fetchExpensesByMonthAndYear(
+  public List<ExpenseDTO> fetchExpensesByMonthAndYear(
     int month,
     int year,
     long userId
   ) {
-    return expenseRepository.findExpensesByMonthAndYear(month, year, userId);
+    return expenseRepository
+      .findExpensesByMonthAndYear(month, year, userId)
+      .stream()
+      .map(this::toExpenseDTO)
+      .toList();
   }
 
   // not working, will fix it
   // @Cacheable(value = "expenses:user-type-month-year", key = "{#userId, #isItIncome, #month,
   // #year}")
-  public List<Expense> fetchExpensesByTypeMonthAndYear(
+  public List<ExpenseDTO> fetchExpensesByTypeMonthAndYear(
     boolean isItIncome,
     int month,
     int year,
     long userId
   ) {
-    return expenseRepository.findExpensesByTypeMonthAndYear(
-      isItIncome,
-      month,
-      year,
-      userId
-    );
+    return expenseRepository
+      .findExpensesByTypeMonthAndYear(isItIncome, month, year, userId)
+      .stream()
+      .map(this::toExpenseDTO)
+      .toList();
   }
 
   @CacheEvict(value = "expenses:user", key = "#userId")
-  public Expense createExpense(Expense expense, long userId) {
+  public ExpenseDTO createExpense(Expense expense, long userId) {
     try {
       expense.setUser(userService.findUser(userId));
-      return expenseRepository.save(expense);
+      return toExpenseDTO(expenseRepository.save(expense));
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());
     }
@@ -80,7 +92,7 @@ public class ExpenseService {
       @CacheEvict(value = "expenses:user", key = "#userId"),
     }
   )
-  public Expense updateExpense(
+  public ExpenseDTO updateExpense(
     long id,
     Map<String, Object> fields,
     long userId
@@ -94,7 +106,7 @@ public class ExpenseService {
           ReflectionUtils.setField(field, expense, value);
         }
       });
-      return expenseRepository.save(expense);
+      return toExpenseDTO(expenseRepository.save(expense));
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());
     }
@@ -108,5 +120,17 @@ public class ExpenseService {
   )
   public void deleteExpense(long id, long userId) {
     expenseRepository.delete(findExpense(id, userId));
+  }
+
+  private ExpenseDTO toExpenseDTO(Expense expense) {
+    return new ExpenseDTO(
+      expense.getId(),
+      expense.getAmount(),
+      expense.getTitle(),
+      expense.getDescription(),
+      expense.getCategory(),
+      expense.isIncome(),
+      expense.getDateAdded()
+    );
   }
 }

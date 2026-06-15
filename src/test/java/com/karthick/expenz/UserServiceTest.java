@@ -6,6 +6,8 @@ import static org.mockito.Mockito.*;
 
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
+import com.karthick.expenz.users.dto.UserCreateDTO;
+import com.karthick.expenz.users.dto.UserDTO;
 import com.karthick.expenz.users.entity.User;
 import com.karthick.expenz.users.repository.UserRepository;
 import com.karthick.expenz.users.service.UserService;
@@ -40,6 +42,10 @@ public class UserServiceTest {
     return user;
   }
 
+  private UserCreateDTO getTestUserCreateDTOData() {
+    return new UserCreateDTO("kang", "kang@marvel.com", "encrypted password");
+  }
+
   @Test
   public void testGetUserById() {
     User mockUser = getTestUserData();
@@ -71,15 +77,19 @@ public class UserServiceTest {
   @Test
   public void testCreateNewUser() {
     User mockUser = getTestUserData();
-    when(userRepository.save(mockUser)).thenReturn(mockUser);
-    when(passwordEncoder.encode(mockUser.getPassword())).thenReturn(
+    UserCreateDTO mockUserCreateDTO = getTestUserCreateDTOData();
+
+    when(userRepository.save(any(User.class))).thenReturn(mockUser);
+    when(passwordEncoder.encode(mockUserCreateDTO.getPassword())).thenReturn(
       "encrypted password"
     );
 
-    User user = userService.createUser(mockUser);
+    UserDTO userDTO = userService.createUser(mockUserCreateDTO);
 
-    assertEquals(mockUser, user);
-    verify(userRepository, times(1)).save(mockUser);
+    assertEquals(mockUser.getId(), userDTO.getId());
+    assertEquals(mockUser.getEmail(), userDTO.getEmail());
+    assertEquals(mockUser.getUsername(), userDTO.getUsername());
+    verify(userRepository, times(1)).save(any(User.class));
     /*
      * # need to clarify how to pass invalid type to primitive types
      * Executable invalidUser = () -> userService.createNewUser(mockUser);
@@ -99,14 +109,16 @@ public class UserServiceTest {
       "email",
       "kangtheconqueror@marvel.com"
     );
-    User validUser = userService.updateUser(mockUser.getId(), updatedFields);
+    UserDTO validUser = userService.updateUser(mockUser.getId(), updatedFields);
     Executable wrongId = () -> userService.updateUser(2, updatedFields);
 
     Map<String, Object> invalidFieldType = Map.of("email", 616);
     Executable invalidUser = () ->
       userService.updateUser(mockUser.getId(), invalidFieldType);
 
-    assertEquals(mockUser, validUser);
+    assertEquals(mockUser.getId(), validUser.getId());
+    assertEquals(mockUser.getEmail(), validUser.getEmail());
+    assertEquals(mockUser.getUsername(), validUser.getUsername());
     assertThrows(EntityNotFoundException.class, wrongId);
     assertThrows(BadRequestException.class, invalidUser);
     verify(userRepository, times(1)).save(mockUser);
