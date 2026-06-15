@@ -4,19 +4,19 @@
 
 ### Requirements
 
-- **Java** version 17
-- **MySQL** version 8
+- **Java** version 21
+- **PostgreSQL** version 18.3
 - **Redis**
 
 ### Steps to run the application
 
-Ensure the **MySQL** server is running
+Ensure the **PostgreSQL** server is running
 
 ```shell
-sudo service mysql status
+sudo service postgresql status
 ```
 
-Create the **expenz** database in your **MySQL** locally
+Create the **expenz** database in your **PostgreSQL** locally
 
 ```shell
 CREATE DATABASE Expenz;
@@ -38,7 +38,7 @@ java -jar build/libs/Expenz-0.0.1-SNAPSHOT.jar
 
 ### Requirements
 
-- **Java** version 17
+- **Java** version 21
 - **Docker**
 
 ### Steps to run the application
@@ -52,8 +52,8 @@ docker version
 Comment the below lines in the **application.properties** file
 
 ```text
-## MySQL - Local connection
-spring.datasource.url=jdbc:mysql://localhost:3306/expenz
+## PostgreSQL - Local connection
+spring.datasource.url=jdbc:postgresql://localhost:5432/expenz
 spring.datasource.username=root
 spring.datasource.password=root
 ```
@@ -61,8 +61,8 @@ spring.datasource.password=root
 Uncomment the below lines in the **application.properties** file to use the Docker containers connection
 
 ```text
-## MySQL - Docker container connection
-#spring.datasource.url=jdbc:mysql://mysql:3306/expenz
+## PostgreSQL - Docker container connection
+#spring.datasource.url=jdbc:postgresql://postgres:5432/expenz
 #spring.datasource.username=user
 #spring.datasource.password=password
 
@@ -85,17 +85,17 @@ docker compose build
 docker compose up
 ```
 
-Ensure the **Expenz application**, **MySQL** and **Redis** containers are present in list
+Ensure the **Expenz application**, **PostgreSQL** and **Redis** containers are present in list
 
 ```shell
 docker ps
 ```
 
-If you want to execute MySQL commands, connect to the **MySQL container** bash
+If you want to execute PostgreSQL commands, connect to the **PostgreSQL container** bash
 
 ```shell
-docker exec -it mysql /bin/bash
-mysql -u user -ppassword
+docker exec -it postgres /bin/bash
+pqsl -U user -ppassword
 ```
 
 ## REST APIs

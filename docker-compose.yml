@@ -1,31 +1,30 @@
-version: '3.7'
+version: "3.7"
 
 services:
-  mysql:
-    image: mysql:8.0
+  postgres:
+    image: postgres:18.3
     volumes:
-      - mysql-vol:/var/lib/mysql
+      - postgres-vol:/var/lib/postgresql/data
     networks:
-      - mysql-network
+      - app-network
     restart: always
     environment:
-      MYSQL_DATABASE: expenz
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: root
+      POSTGRES_DB: expenz
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     ports:
-      - '3306:3306'
+      - "5432:5432"
     expose:
-      - '3306'
+      - "5432"
 
   redis:
     image: redis:latest
     volumes:
       - redis-vol:/data
     networks:
-      - mysql-network
+      - app-network
     ports:
-      - '6379:6379'
+      - "6379:6379"
     restart: always
 
   spring-app:
@@ -33,19 +32,19 @@ services:
     volumes:
       - expenz-vol:/path/in/container
     networks:
-      - mysql-network
+      - app-network
     restart: always
     ports:
-      - '8080:8080'
+      - "8080:8080"
     depends_on:
-      - mysql
+      - postgres
       - redis
-    command: bash -c 'while !</dev/tcp/mysql/3306; do sleep 5; done && java -jar Expenz.jar'
+    command: bash -c 'while !</dev/tcp/postgres/5432; do sleep 5; done && java -jar Expenz.jar'
 
 networks:
-  mysql-network:
+  app-network:
 
 volumes:
-  mysql-vol:
+  postgres-vol:
   redis-vol:
   expenz-vol:

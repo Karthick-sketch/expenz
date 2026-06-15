@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:21-jre-jammy
 
 COPY build/libs/Expenz-0.0.1-SNAPSHOT.jar Expenz.jar
 
