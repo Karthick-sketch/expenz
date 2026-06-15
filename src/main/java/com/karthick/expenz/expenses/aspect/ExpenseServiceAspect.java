@@ -1,4 +1,4 @@
-package com.karthick.expenz.aspect;
+package com.karthick.expenz.expenses.aspect;
 
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.security.SecurityConstants;

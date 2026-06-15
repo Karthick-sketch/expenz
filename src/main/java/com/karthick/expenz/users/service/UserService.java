@@ -1,9 +1,9 @@
-package com.karthick.expenz.service;
+package com.karthick.expenz.users.service;
 
-import com.karthick.expenz.entity.User;
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
-import com.karthick.expenz.repository.UserRepository;
+import com.karthick.expenz.users.entity.User;
+import com.karthick.expenz.users.repository.UserRepository;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;

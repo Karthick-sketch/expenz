@@ -1,8 +1,8 @@
-package com.karthick.expenz.controller;
+package com.karthick.expenz.expenses.controller;
 
-import com.karthick.expenz.entity.Expense;
+import com.karthick.expenz.expenses.entity.Expense;
+import com.karthick.expenz.expenses.service.ExpenseService;
 import com.karthick.expenz.security.UserSession;
-import com.karthick.expenz.service.ExpenseService;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;

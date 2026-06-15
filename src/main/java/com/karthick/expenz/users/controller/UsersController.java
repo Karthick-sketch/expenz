@@ -1,7 +1,7 @@
-package com.karthick.expenz.controller;
+package com.karthick.expenz.users.controller;
 
-import com.karthick.expenz.entity.User;
-import com.karthick.expenz.service.UserService;
+import com.karthick.expenz.users.entity.User;
+import com.karthick.expenz.users.service.UserService;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -3,13 +3,13 @@ package com.karthick.expenz;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.karthick.expenz.entity.Expense;
-import com.karthick.expenz.entity.User;
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
-import com.karthick.expenz.repository.ExpenseRepository;
-import com.karthick.expenz.service.ExpenseService;
-import com.karthick.expenz.service.UserService;
+import com.karthick.expenz.expenses.entity.Expense;
+import com.karthick.expenz.expenses.repository.ExpenseRepository;
+import com.karthick.expenz.expenses.service.ExpenseService;
+import com.karthick.expenz.users.entity.User;
+import com.karthick.expenz.users.service.UserService;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;

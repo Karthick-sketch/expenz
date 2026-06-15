@@ -1,7 +1,7 @@
 package com.karthick.expenz.security.manager;
 
-import com.karthick.expenz.entity.User;
-import com.karthick.expenz.service.UserService;
+import com.karthick.expenz.users.entity.User;
+import com.karthick.expenz.users.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

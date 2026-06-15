@@ -1,6 +1,6 @@
-package com.karthick.expenz.repository;
+package com.karthick.expenz.users.repository;
 
-import com.karthick.expenz.entity.User;
+import com.karthick.expenz.users.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

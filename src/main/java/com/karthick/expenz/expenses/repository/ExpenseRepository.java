@@ -1,6 +1,6 @@
-package com.karthick.expenz.repository;
+package com.karthick.expenz.expenses.repository;
 
-import com.karthick.expenz.entity.Expense;
+import com.karthick.expenz.expenses.entity.Expense;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

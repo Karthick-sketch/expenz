@@ -1,9 +1,10 @@
-package com.karthick.expenz.service;
+package com.karthick.expenz.expenses.service;
 
-import com.karthick.expenz.entity.Expense;
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
-import com.karthick.expenz.repository.ExpenseRepository;
+import com.karthick.expenz.expenses.entity.Expense;
+import com.karthick.expenz.expenses.repository.ExpenseRepository;
+import com.karthick.expenz.users.service.UserService;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;

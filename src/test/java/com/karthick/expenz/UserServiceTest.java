@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-import com.karthick.expenz.entity.User;
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
-import com.karthick.expenz.repository.UserRepository;
-import com.karthick.expenz.service.UserService;
+import com.karthick.expenz.users.entity.User;
+import com.karthick.expenz.users.repository.UserRepository;
+import com.karthick.expenz.users.service.UserService;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;

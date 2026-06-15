@@ -1,6 +1,7 @@
-package com.karthick.expenz.entity;
+package com.karthick.expenz.users.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.karthick.expenz.expenses.entity.Expense;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
