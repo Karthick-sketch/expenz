@@ -20,8 +20,8 @@ public class User implements Serializable {
   private long id;
 
   @NonNull
-  @Column(name = "username", nullable = false, unique = true)
-  private String username;
+  @Column(name = "name", nullable = false)
+  private String name;
 
   @NonNull
   @Column(name = "email", nullable = false, unique = true)
@@ -30,6 +30,9 @@ public class User implements Serializable {
   @NonNull
   @Column(name = "password", nullable = false)
   private String password;
+
+  @Column(name = "active", nullable = false)
+  private boolean active = true;
 
   @JsonIgnore
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

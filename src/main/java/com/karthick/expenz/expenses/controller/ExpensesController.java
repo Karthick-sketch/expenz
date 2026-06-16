@@ -1,9 +1,9 @@
 package com.karthick.expenz.expenses.controller;
 
+import com.karthick.expenz.auth.UserSession;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.service.ExpenseService;
-import com.karthick.expenz.security.UserSession;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -13,18 +13,17 @@ import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/expense")
+@RequestMapping("/api/expenses")
 public class ExpensesController {
 
-  private ExpenseService expenseService;
-  private UserSession userSession;
+  private final ExpenseService expenseService;
+  private final UserSession userSession;
 
   @GetMapping("/all")
   public ResponseEntity<List<ExpenseDTO>> getAllExpenses() {
-    return new ResponseEntity<>(
-      expenseService.fetchAllExpenses(userSession.getAuthenticatedUserId()),
-      HttpStatus.OK
-    );
+    Long userId = userSession.getAuthenticatedUserId();
+    List<ExpenseDTO> expenses = expenseService.fetchAllExpenses(userId);
+    return new ResponseEntity<>(expenses, HttpStatus.OK);
   }
 
   @GetMapping

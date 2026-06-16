@@ -10,8 +10,6 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -23,7 +21,6 @@ public class UserService {
   private UserRepository userRepository;
   private PasswordEncoder passwordEncoder;
 
-  @Cacheable(value = "user", key = "#id")
   public User findUser(long id) {
     Optional<User> user = userRepository.findById(id);
     if (user.isPresent()) {
@@ -32,20 +29,17 @@ public class UserService {
     throw new EntityNotFoundException(id, User.class);
   }
 
-  @Cacheable(value = "user", key = "#id")
   public UserDTO findUserDTO(long id) {
     return toUserDTO(findUser(id));
   }
 
-  public User findUserByUsername(String username) {
-    Optional<User> user = userRepository.findByUsername(username);
+  public User findUserByEmail(String email) {
+    Optional<User> user = userRepository.findByEmailIgnoreCase(email);
     if (user.isPresent()) {
       return user.get();
     }
     throw new EntityNotFoundException(
-      "The user with the username '" +
-        username +
-        "' does not exist in our records"
+      "The user with the email '" + email + "' does not exist in our records"
     );
   }
 
@@ -59,7 +53,6 @@ public class UserService {
     }
   }
 
-  @CacheEvict(value = "user", key = "#id")
   public UserDTO updateUser(long id, Map<String, Object> fields) {
     User user = findUser(id);
     try {
@@ -76,7 +69,6 @@ public class UserService {
     }
   }
 
-  @CacheEvict(value = "user", key = "#id")
   public void deleteUser(long id) {
     if (userRepository.existsById(id)) {
       userRepository.deleteById(id);
@@ -90,6 +82,6 @@ public class UserService {
   }
 
   private UserDTO toUserDTO(User user) {
-    return new UserDTO(user.getId(), user.getUsername(), user.getEmail());
+    return new UserDTO(user.getId(), user.getName(), user.getEmail());
   }
 }

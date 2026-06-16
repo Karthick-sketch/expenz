@@ -1,6 +1,5 @@
 package com.karthick.expenz.users.controller;
 
-import com.karthick.expenz.users.dto.UserCreateDTO;
 import com.karthick.expenz.users.dto.UserDTO;
 import com.karthick.expenz.users.service.UserService;
 import java.util.Map;
@@ -10,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 @AllArgsConstructor
 public class UsersController {
 
@@ -19,16 +18,6 @@ public class UsersController {
   @GetMapping("/{user-id}")
   public ResponseEntity<UserDTO> getUserById(@PathVariable("user-id") long id) {
     return new ResponseEntity<>(userService.findUserDTO(id), HttpStatus.OK);
-  }
-
-  @PostMapping("/register")
-  public ResponseEntity<UserDTO> createNewUser(
-    @RequestBody UserCreateDTO user
-  ) {
-    return new ResponseEntity<>(
-      userService.createUser(user),
-      HttpStatus.CREATED
-    );
   }
 
   @PatchMapping("/{user-id}")

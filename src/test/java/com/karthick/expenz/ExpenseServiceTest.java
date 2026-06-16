@@ -50,7 +50,7 @@ public class ExpenseServiceTest {
 
     User user = new User();
     user.setId(1);
-    user.setUsername("Michael De Santa");
+    user.setName("Michael De Santa");
     user.setEmail("michaeldesanta@eyefind.com");
     user.setPassword("gta5");
     expense.setUser(user);
@@ -177,12 +177,13 @@ public class ExpenseServiceTest {
         year,
         mockExpense.getUser().getId()
       );
-    List<ExpenseDTO> validIncomes = expenseService.fetchExpensesByTypeMonthAndYear(
-      true,
-      month,
-      year,
-      mockExpense.getUser().getId()
-    );
+    List<ExpenseDTO> validIncomes =
+      expenseService.fetchExpensesByTypeMonthAndYear(
+        true,
+        month,
+        year,
+        mockExpense.getUser().getId()
+      );
     assertEquals(1, validExpenses.size());
     assertExpenseEqualsDTO(mockExpense, validExpenses.get(0));
     assertTrue(validIncomes.isEmpty());
@@ -191,7 +192,9 @@ public class ExpenseServiceTest {
   @Test
   public void testCreateNewExpense() {
     Expense mockExpense = getTestExpenseData();
-    when(userService.findUser(mockExpense.getUser().getId())).thenReturn(mockExpense.getUser());
+    when(userService.findUser(mockExpense.getUser().getId())).thenReturn(
+      mockExpense.getUser()
+    );
     when(expenseRepository.save(mockExpense)).thenReturn(mockExpense);
 
     ExpenseDTO expense = expenseService.createExpense(

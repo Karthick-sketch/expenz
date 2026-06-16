@@ -1,7 +1,7 @@
 package com.karthick.expenz.expenses.aspect;
 
+import com.karthick.expenz.constants.UtilConstants;
 import com.karthick.expenz.exception.BadRequestException;
-import com.karthick.expenz.security.SecurityConstants;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -32,7 +32,7 @@ public class ExpenseServiceAspect {
   }
 
   private void validateUserId(long userId) {
-    if (userId == SecurityConstants.NOT_FOUND) {
+    if (userId == UtilConstants.NOT_FOUND_ID) {
       throw new BadRequestException("something wrong at authentication");
     }
   }

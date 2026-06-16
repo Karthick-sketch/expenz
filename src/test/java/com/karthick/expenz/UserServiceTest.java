@@ -36,7 +36,7 @@ public class UserServiceTest {
   private User getTestUserData() {
     User user = new User();
     user.setId(1);
-    user.setUsername("Kang");
+    user.setName("Kang");
     user.setEmail("kang@marvel.com");
     user.setPassword("encrypted password");
     return user;
@@ -63,12 +63,12 @@ public class UserServiceTest {
   @Test
   public void testGetUserByUsername() {
     User mockUser = getTestUserData();
-    when(userRepository.findByUsername(mockUser.getUsername())).thenReturn(
+    when(userRepository.findByEmailIgnoreCase(mockUser.getEmail())).thenReturn(
       (Optional.of(mockUser))
     );
 
-    User validUser = userService.findUserByUsername(mockUser.getUsername());
-    Executable wrongId = () -> userService.findUserByUsername("testuser");
+    User validUser = userService.findUserByEmail(mockUser.getEmail());
+    Executable wrongId = () -> userService.findUserByEmail("testuser");
 
     assertEquals(mockUser, validUser);
     assertThrows(EntityNotFoundException.class, wrongId);
@@ -88,7 +88,7 @@ public class UserServiceTest {
 
     assertEquals(mockUser.getId(), userDTO.getId());
     assertEquals(mockUser.getEmail(), userDTO.getEmail());
-    assertEquals(mockUser.getUsername(), userDTO.getUsername());
+    assertEquals(mockUser.getName(), userDTO.getName());
     verify(userRepository, times(1)).save(any(User.class));
     /*
      * # need to clarify how to pass invalid type to primitive types
@@ -118,7 +118,7 @@ public class UserServiceTest {
 
     assertEquals(mockUser.getId(), validUser.getId());
     assertEquals(mockUser.getEmail(), validUser.getEmail());
-    assertEquals(mockUser.getUsername(), validUser.getUsername());
+    assertEquals(mockUser.getName(), validUser.getName());
     assertThrows(EntityNotFoundException.class, wrongId);
     assertThrows(BadRequestException.class, invalidUser);
     verify(userRepository, times(1)).save(mockUser);
