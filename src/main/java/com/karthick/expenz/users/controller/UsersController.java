@@ -1,8 +1,9 @@
 package com.karthick.expenz.users.controller;
 
+import com.karthick.expenz.auth.UserSession;
 import com.karthick.expenz.users.dto.UserDTO;
+import com.karthick.expenz.users.dto.UserUpdateDTO;
 import com.karthick.expenz.users.service.UserService;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,27 +16,33 @@ public class UsersController {
 
   private UserService userService;
 
-  @GetMapping("/{user-id}")
-  public ResponseEntity<UserDTO> getUserById(@PathVariable("user-id") long id) {
-    return new ResponseEntity<>(userService.findUserDTO(id), HttpStatus.OK);
+  private UserSession userSession;
+
+  private Long userId() {
+    return userSession.getAuthenticatedUserId();
   }
 
-  @PatchMapping("/{user-id}")
-  public ResponseEntity<UserDTO> updateUserById(
-    @PathVariable("user-id") long id,
-    @RequestBody Map<String, Object> updatedUser
-  ) {
+  @GetMapping
+  public ResponseEntity<UserDTO> getUser() {
     return new ResponseEntity<>(
-      userService.updateUser(id, updatedUser),
+      userService.findUserDTO(userId()),
       HttpStatus.OK
     );
   }
 
-  @DeleteMapping("/{user-id}")
-  public ResponseEntity<HttpStatus> deleteUserById(
-    @PathVariable("user-id") long id
+  @PatchMapping
+  public ResponseEntity<UserDTO> updateUser(
+    @RequestBody UserUpdateDTO updatedUser
   ) {
-    userService.deleteUser(id);
+    return new ResponseEntity<>(
+      userService.updateUser(userId(), updatedUser),
+      HttpStatus.OK
+    );
+  }
+
+  @DeleteMapping
+  public ResponseEntity<HttpStatus> deleteUser() {
+    userService.deleteUser(userId());
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 }

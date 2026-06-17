@@ -4,15 +4,13 @@ import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.users.dto.UserCreateDTO;
 import com.karthick.expenz.users.dto.UserDTO;
+import com.karthick.expenz.users.dto.UserUpdateDTO;
 import com.karthick.expenz.users.entity.User;
 import com.karthick.expenz.users.repository.UserRepository;
-import java.lang.reflect.Field;
-import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 
 @Service
 @AllArgsConstructor
@@ -53,16 +51,13 @@ public class UserService {
     }
   }
 
-  public UserDTO updateUser(long id, Map<String, Object> fields) {
+  public UserDTO updateUser(long id, UserUpdateDTO updatedUser) {
     User user = findUser(id);
+    user.setName(updatedUser.name());
+    user.setEmail(updatedUser.email());
+    user.setPassword(passwordEncoder.encode(updatedUser.password()));
+
     try {
-      fields.forEach((key, value) -> {
-        Field field = ReflectionUtils.findField(User.class, key);
-        if (field != null) {
-          field.setAccessible(true);
-          ReflectionUtils.setField(field, user, value);
-        }
-      });
       return toUserDTO(userRepository.save(user));
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());
@@ -70,15 +65,11 @@ public class UserService {
   }
 
   public void deleteUser(long id) {
-    if (userRepository.existsById(id)) {
-      userRepository.deleteById(id);
-      return;
-    }
-    throw new EntityNotFoundException(id, User.class);
+    userRepository.delete(findUser(id));
   }
 
   private User toUser(UserCreateDTO user) {
-    return new User(user.getUsername(), user.getEmail(), user.getPassword());
+    return new User(user.getName(), user.getEmail(), user.getPassword());
   }
 
   private UserDTO toUserDTO(User user) {

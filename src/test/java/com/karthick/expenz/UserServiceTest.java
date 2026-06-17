@@ -4,14 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.users.dto.UserCreateDTO;
 import com.karthick.expenz.users.dto.UserDTO;
+import com.karthick.expenz.users.dto.UserUpdateDTO;
 import com.karthick.expenz.users.entity.User;
 import com.karthick.expenz.users.repository.UserRepository;
 import com.karthick.expenz.users.service.UserService;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -98,41 +97,40 @@ public class UserServiceTest {
   }
 
   @Test
-  public void testUpdateUserByFields() {
+  public void testUpdateUser() {
     User mockUser = getTestUserData();
     when(userRepository.findById(mockUser.getId())).thenReturn(
-      (Optional.of(mockUser))
+      Optional.of(mockUser)
     );
     when(userRepository.save(mockUser)).thenReturn(mockUser);
+    when(passwordEncoder.encode(any())).thenReturn("encrypted password");
 
-    Map<String, Object> updatedFields = Map.of(
-      "email",
-      "kangtheconqueror@marvel.com"
+    UserUpdateDTO updatedFields = new UserUpdateDTO(
+      mockUser.getName(),
+      "kangtheconqueror@marvel.com",
+      "newpassword"
     );
     UserDTO validUser = userService.updateUser(mockUser.getId(), updatedFields);
     Executable wrongId = () -> userService.updateUser(2, updatedFields);
-
-    Map<String, Object> invalidFieldType = Map.of("email", 616);
-    Executable invalidUser = () ->
-      userService.updateUser(mockUser.getId(), invalidFieldType);
 
     assertEquals(mockUser.getId(), validUser.getId());
     assertEquals(mockUser.getEmail(), validUser.getEmail());
     assertEquals(mockUser.getName(), validUser.getName());
     assertThrows(EntityNotFoundException.class, wrongId);
-    assertThrows(BadRequestException.class, invalidUser);
     verify(userRepository, times(1)).save(mockUser);
   }
 
   @Test
   public void testDeleteUserById() {
     User mockUser = getTestUserData();
-    when(userRepository.existsById(mockUser.getId())).thenReturn(true);
+    when(userRepository.findById(mockUser.getId())).thenReturn(
+      Optional.of(mockUser)
+    );
 
     userService.deleteUser(mockUser.getId());
     Executable wrongId = () -> userService.deleteUser(2);
 
     assertThrows(EntityNotFoundException.class, wrongId);
-    verify(userRepository, times(1)).deleteById(mockUser.getId());
+    verify(userRepository, times(1)).delete(mockUser);
   }
 }
