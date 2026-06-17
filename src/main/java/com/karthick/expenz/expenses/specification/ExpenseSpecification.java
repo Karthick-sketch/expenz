@@ -6,14 +6,14 @@ import org.springframework.data.jpa.domain.Specification;
 public class ExpenseSpecification {
 
   public static Specification<Expense> withUserId(long userId) {
-    return (root, query, cb) -> cb.equal(root.get("user_id"), userId);
+    return (root, query, cb) -> cb.equal(root.get("user").get("id"), userId);
   }
 
   public static Specification<Expense> withExpenseType(Boolean expensType) {
     if (expensType == null) {
       return (root, query, cb) -> cb.conjunction();
     }
-    return (root, query, cb) -> cb.equal(root.get("is_income"), expensType);
+    return (root, query, cb) -> cb.equal(root.get("income"), expensType);
   }
 
   public static Specification<Expense> withMonth(Integer month) {
@@ -23,10 +23,10 @@ public class ExpenseSpecification {
     return (root, query, cb) ->
       cb.equal(
         cb.function(
-          "EXTRACT",
+          "date_part",
           Integer.class,
-          cb.literal("MONTH FROM"),
-          root.get("date_added")
+          cb.literal("month"),
+          root.get("dateAdded")
         ),
         month
       );
@@ -39,10 +39,10 @@ public class ExpenseSpecification {
     return (root, query, cb) ->
       cb.equal(
         cb.function(
-          "EXTRACT",
+          "date_part",
           Integer.class,
-          cb.literal("YEAR FROM"),
-          root.get("date_added")
+          cb.literal("year"),
+          root.get("dateAdded")
         ),
         year
       );

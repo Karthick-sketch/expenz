@@ -9,6 +9,7 @@ import com.karthick.expenz.expenses.repository.ExpenseRepository;
 import com.karthick.expenz.expenses.specification.ExpenseSpecification;
 import com.karthick.expenz.users.service.UserService;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -41,11 +42,11 @@ public class ExpenseService {
       today.getYear(),
       null
     );
-    return expenseRepository
-      .findAll(spec)
-      .stream()
-      .map(this::toExpenseDTO)
-      .toList();
+    try {
+      return getExpensesDTO(expenseRepository.findAll(spec));
+    } catch (Exception ex) {
+      throw new BadRequestException(ex.getMessage());
+    }
   }
 
   public List<ExpenseDTO> fetchExpenses(
@@ -55,11 +56,7 @@ public class ExpenseService {
     long userId
   ) {
     Specification<Expense> spec = buildSpecification(userId, month, year, type);
-    return expenseRepository
-      .findAll(spec)
-      .stream()
-      .map(this::toExpenseDTO)
-      .toList();
+    return getExpensesDTO(expenseRepository.findAll(spec));
   }
 
   public Expense findExpense(long id, long userId) {
@@ -109,6 +106,13 @@ public class ExpenseService {
       .and(ExpenseSpecification.withMonth(month))
       .and(ExpenseSpecification.withYear(year))
       .and(ExpenseSpecification.withExpenseType(type));
+  }
+
+  private List<ExpenseDTO> getExpensesDTO(List<Expense> expenses) {
+    if (expenses == null || expenses.isEmpty()) {
+      return Collections.emptyList();
+    }
+    return expenses.stream().map(this::toExpenseDTO).toList();
   }
 
   private Expense toExpense(ExpenseDTO expenseDTO) {
