@@ -13,8 +13,6 @@ import com.karthick.expenz.expenses.service.ExpenseService;
 import com.karthick.expenz.users.entity.User;
 import com.karthick.expenz.users.service.UserService;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -37,7 +35,7 @@ public class ExpenseServiceTest {
   @InjectMocks
   private ExpenseService expenseService;
 
-  private final Date date = new Date();
+  private final LocalDate date = LocalDate.now();
 
   private Expense getTestExpenseData() {
     Expense expense = new Expense();
@@ -146,12 +144,8 @@ public class ExpenseServiceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testFetchExpensesByMonthAndYear() {
-    LocalDate localDate = date
-      .toInstant()
-      .atZone(ZoneId.systemDefault())
-      .toLocalDate();
-    int month = localDate.getMonthValue(),
-      year = localDate.getYear();
+    int month = date.getMonthValue(),
+      year = date.getYear();
 
     Expense mockExpense = getTestExpenseData();
     when(expenseRepository.findAll(any(Specification.class))).thenReturn(
@@ -171,12 +165,8 @@ public class ExpenseServiceTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testFetchExpensesByTypeMonthAndYear() {
-    LocalDate localDate = date
-      .toInstant()
-      .atZone(ZoneId.systemDefault())
-      .toLocalDate();
-    int month = localDate.getMonthValue(),
-      year = localDate.getYear();
+    int month = date.getMonthValue(),
+      year = date.getYear();
 
     Expense mockExpense = getTestExpenseData();
     // mockExpense.isIncome() == false, so fetching expenses (false) returns results,

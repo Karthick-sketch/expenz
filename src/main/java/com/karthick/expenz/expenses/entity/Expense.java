@@ -3,7 +3,7 @@ package com.karthick.expenz.expenses.entity;
 import com.karthick.expenz.users.entity.User;
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,10 +20,13 @@ public class Expense implements Serializable {
   @Column(name = "amount", nullable = false)
   private double amount;
 
+  @Column(name = "currency_code", nullable = false)
+  private String currencyCode;
+
   @Column(name = "title", nullable = false)
   private String title;
 
-  @Column(name = "description", nullable = false)
+  @Column(name = "description")
   private String description;
 
   @Column(name = "category", nullable = false)
@@ -33,7 +36,7 @@ public class Expense implements Serializable {
   private boolean income;
 
   @Column(name = "date_added", nullable = false)
-  private Date dateAdded;
+  private LocalDate dateAdded;
 
   @ManyToOne(optional = false)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
