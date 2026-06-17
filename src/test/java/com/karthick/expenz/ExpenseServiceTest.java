@@ -84,7 +84,7 @@ public class ExpenseServiceTest {
   public void testFindExpensesById() {
     Expense mockExpense = getTestExpenseData();
     when(
-      expenseRepository.findByIdAndUserID(
+      expenseRepository.findByIdAndUserId(
         mockExpense.getId(),
         mockExpense.getUser().getId()
       )
@@ -108,7 +108,7 @@ public class ExpenseServiceTest {
   public void testFindExpenseDTOById() {
     Expense mockExpense = getTestExpenseData();
     when(
-      expenseRepository.findByIdAndUserID(
+      expenseRepository.findByIdAndUserId(
         mockExpense.getId(),
         mockExpense.getUser().getId()
       )
@@ -225,7 +225,7 @@ public class ExpenseServiceTest {
   public void testUpdateExpenseById() {
     Expense mockExpense = getTestExpenseData();
     when(
-      expenseRepository.findByIdAndUserID(
+      expenseRepository.findByIdAndUserId(
         mockExpense.getId(),
         mockExpense.getUser().getId()
       )
@@ -263,7 +263,7 @@ public class ExpenseServiceTest {
   public void testDeleteExpenseById() {
     Expense mockExpense = getTestExpenseData();
     when(
-      expenseRepository.findByIdAndUserID(
+      expenseRepository.findByIdAndUserId(
         mockExpense.getId(),
         mockExpense.getUser().getId()
       )

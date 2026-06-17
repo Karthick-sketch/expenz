@@ -63,7 +63,7 @@ public class ExpenseService {
   }
 
   public Expense findExpense(long id, long userId) {
-    Optional<Expense> expense = expenseRepository.findByIdAndUserID(id, userId);
+    Optional<Expense> expense = expenseRepository.findByIdAndUserId(id, userId);
     if (expense.isEmpty()) {
       throw new EntityNotFoundException(id, Expense.class);
     }

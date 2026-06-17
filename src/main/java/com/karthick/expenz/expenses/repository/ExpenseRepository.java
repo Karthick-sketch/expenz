@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface ExpenseRepository
   extends JpaRepository<Expense, Long>, JpaSpecificationExecutor<Expense>
 {
-  Optional<Expense> findByIdAndUserID(long id, long userId);
+  Optional<Expense> findByIdAndUserId(long id, long userId);
 
   List<Expense> findByUserId(long userId);
 }
