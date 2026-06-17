@@ -1,6 +1,5 @@
 package com.karthick.expenz.expenses.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.karthick.expenz.users.entity.User;
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -31,12 +30,11 @@ public class Expense implements Serializable {
   private String category;
 
   @Column(name = "is_income", nullable = false)
-  private boolean isIncome;
+  private boolean income;
 
   @Column(name = "date_added", nullable = false)
   private Date dateAdded;
 
-  @JsonIgnore
   @ManyToOne(optional = false)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   private User user;

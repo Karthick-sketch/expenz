@@ -2,10 +2,9 @@ package com.karthick.expenz.expenses.controller;
 
 import com.karthick.expenz.auth.UserSession;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
-import com.karthick.expenz.expenses.entity.Expense;
+import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.service.ExpenseService;
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,96 +16,60 @@ import org.springframework.web.bind.annotation.*;
 public class ExpensesController {
 
   private final ExpenseService expenseService;
+
   private final UserSession userSession;
 
-  @GetMapping("/all")
-  public ResponseEntity<List<ExpenseDTO>> getAllExpenses() {
-    Long userId = userSession.getAuthenticatedUserId();
-    List<ExpenseDTO> expenses = expenseService.fetchAllExpenses(userId);
-    return new ResponseEntity<>(expenses, HttpStatus.OK);
+  private Long userId() {
+    return userSession.getAuthenticatedUserId();
+  }
+
+  @PostMapping
+  public ResponseEntity<ExpenseDTO> createNewExpense(
+    @RequestBody ExpenseDTO expenseDTO
+  ) {
+    return new ResponseEntity<>(
+      expenseService.createExpense(expenseDTO, userId()),
+      HttpStatus.CREATED
+    );
   }
 
   @GetMapping
-  public ResponseEntity<List<ExpenseDTO>> getAllExpensesByMonthAndYear(
-    @RequestParam int month,
-    int year
+  public ResponseEntity<List<ExpenseDTO>> getExpenses(
+    @RequestParam(required = false) Integer month,
+    @RequestParam(required = false) Integer year,
+    @RequestParam(required = false) Boolean type
   ) {
     return new ResponseEntity<>(
-      expenseService.fetchExpensesByMonthAndYear(
-        month,
-        year,
-        userSession.getAuthenticatedUserId()
-      ),
+      expenseService.fetchExpenses(month, year, type, userId()),
       HttpStatus.OK
     );
   }
 
-  @GetMapping("/expenses")
-  public ResponseEntity<List<ExpenseDTO>> getExpensesByMonthAndYear(
-    @RequestParam int month,
-    int year
-  ) {
+  @GetMapping("/this-month")
+  public ResponseEntity<List<ExpenseDTO>> getThisMonthExpenses() {
     return new ResponseEntity<>(
-      expenseService.fetchExpensesByTypeMonthAndYear(
-        false,
-        month,
-        year,
-        userSession.getAuthenticatedUserId()
-      ),
-      HttpStatus.OK
-    );
-  }
-
-  @GetMapping("/incomes")
-  public ResponseEntity<List<ExpenseDTO>> getIncomesByMonthAndYear(
-    @RequestParam int month,
-    int year
-  ) {
-    return new ResponseEntity<>(
-      expenseService.fetchExpensesByTypeMonthAndYear(
-        true,
-        month,
-        year,
-        userSession.getAuthenticatedUserId()
-      ),
+      expenseService.fetchThisMonthExpenses(userId()),
       HttpStatus.OK
     );
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ExpenseDTO> getExpensesById(
+  public ResponseEntity<ExpenseDTO> getExpenseById(
     @PathVariable("id") long id
   ) {
     return new ResponseEntity<>(
-      expenseService.findExpenseDTO(id, userSession.getAuthenticatedUserId()),
+      expenseService.findExpenseDTO(id, userId()),
       HttpStatus.OK
-    );
-  }
-
-  @PostMapping
-  public ResponseEntity<ExpenseDTO> createNewExpense(
-    @RequestBody Expense expense
-  ) {
-    return new ResponseEntity<>(
-      expenseService.createExpense(
-        expense,
-        userSession.getAuthenticatedUserId()
-      ),
-      HttpStatus.CREATED
     );
   }
 
   @PatchMapping("/{id}")
   public ResponseEntity<ExpenseDTO> updateExpenseById(
     @PathVariable("id") long id,
-    @RequestBody Map<String, Object> newData
+    @RequestBody ExpenseUpdateDTO updatedExpense
   ) {
     return new ResponseEntity<>(
-      expenseService.updateExpense(
-        id,
-        newData,
-        userSession.getAuthenticatedUserId()
-      ),
+      expenseService.updateExpense(id, updatedExpense, userId()),
       HttpStatus.OK
     );
   }
@@ -115,7 +78,7 @@ public class ExpensesController {
   public ResponseEntity<HttpStatus> deleteExpenseById(
     @PathVariable("id") long id
   ) {
-    expenseService.deleteExpense(id, userSession.getAuthenticatedUserId());
+    expenseService.deleteExpense(id, userId());
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 }
