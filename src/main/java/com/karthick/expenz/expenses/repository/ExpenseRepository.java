@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ExpenseRepository
   extends JpaRepository<Expense, Long>, JpaSpecificationExecutor<Expense>
@@ -12,4 +14,20 @@ public interface ExpenseRepository
   Optional<Expense> findByIdAndUserId(long id, long userId);
 
   List<Expense> findByUserId(long userId);
+
+  /* Dashboard */
+  Long countByIncomeAndUserId(boolean income, Long userId);
+
+  @Query(
+    "SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND e.income = :income"
+  )
+  Double getTotalExpenses(
+    @Param("userId") Long userId,
+    @Param("income") boolean income
+  );
+
+  @Query(
+    "SELECT e FROM Expense e WHERE e.user.id = :userId ORDER BY e.dateAdded DESC LIMIT 5"
+  )
+  List<Expense> getRecentExpenses(@Param("userId") Long userId);
 }

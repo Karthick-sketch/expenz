@@ -1,6 +1,7 @@
 package com.karthick.expenz.expenses.controller;
 
 import com.karthick.expenz.auth.UserSession;
+import com.karthick.expenz.expenses.dto.DashboardDTO;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.service.ExpenseService;
@@ -80,5 +81,13 @@ public class ExpensesController {
   ) {
     expenseService.deleteExpense(id, userId());
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  @GetMapping("/dashboard")
+  public ResponseEntity<DashboardDTO> getDashboard() {
+    return new ResponseEntity<>(
+      expenseService.getDashboardData(userId()),
+      HttpStatus.OK
+    );
   }
 }

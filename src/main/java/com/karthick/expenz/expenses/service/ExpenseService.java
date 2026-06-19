@@ -2,6 +2,7 @@ package com.karthick.expenz.expenses.service;
 
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
+import com.karthick.expenz.expenses.dto.DashboardDTO;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.entity.Expense;
@@ -92,6 +93,30 @@ public class ExpenseService {
 
   public void deleteExpense(long id, long userId) {
     expenseRepository.delete(findExpense(id, userId));
+  }
+
+  public DashboardDTO getDashboardData(Long userId) {
+    Double totalExpenses = expenseRepository.getTotalExpenses(userId, false);
+    Double totalIncome = expenseRepository.getTotalExpenses(userId, true);
+    Double balance = totalIncome - totalExpenses;
+    Long totalExpenseCount = expenseRepository.countByIncomeAndUserId(
+      false,
+      userId
+    );
+    Long totalIncomeCount = expenseRepository.countByIncomeAndUserId(
+      true,
+      userId
+    );
+    List<Expense> recentExpenses = expenseRepository.getRecentExpenses(userId);
+
+    DashboardDTO dashboardDTO = new DashboardDTO();
+    dashboardDTO.setBalance(balance);
+    dashboardDTO.setTotalExpenses(totalExpenses);
+    dashboardDTO.setTotalIncome(totalIncome);
+    dashboardDTO.setTotalExpenseCount(totalExpenseCount);
+    dashboardDTO.setTotalIncomeCount(totalIncomeCount);
+    dashboardDTO.setRecentExpenses(getExpensesDTO(recentExpenses));
+    return dashboardDTO;
   }
 
   private Specification<Expense> buildSpecification(
