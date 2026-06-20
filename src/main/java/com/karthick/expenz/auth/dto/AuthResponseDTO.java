@@ -1,6 +1,7 @@
 package com.karthick.expenz.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.karthick.expenz.users.dto.UserDTO;
 import lombok.*;
 
 @Getter
@@ -17,4 +18,6 @@ public class AuthResponseDTO {
 
   private String tokenType;
   private Long expiresIn;
+
+  private UserDTO user;
 }

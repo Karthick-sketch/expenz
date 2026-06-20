@@ -41,6 +41,10 @@ public class UserService {
     );
   }
 
+  public UserDTO findUserDTOByEmail(String email) {
+    return toUserDTO(findUserByEmail(email));
+  }
+
   public UserDTO createUser(UserCreateDTO user) {
     try {
       user.setPassword(passwordEncoder.encode(user.getPassword()));
