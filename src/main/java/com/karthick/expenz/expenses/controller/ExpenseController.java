@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/expenses")
-public class ExpensesController {
+public class ExpenseController {
 
   private final ExpenseService expenseService;
 
