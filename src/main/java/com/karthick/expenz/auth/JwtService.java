@@ -64,7 +64,7 @@ public class JwtService {
   // ──────────────────────────────────────────────
 
   public String extractEmail(String token) {
-    return extractClaim(token, Claims::getSubject);
+    return extractClaim(token, claims -> claims.getSubject());
   }
 
   public <T> T extractClaim(String token, Function<Claims, T> resolver) {
@@ -99,7 +99,7 @@ public class JwtService {
   }
 
   private boolean isTokenExpired(String token) {
-    return extractClaim(token, Claims::getExpiration).before(new Date());
+    return extractClaim(token, claims -> claims.getExpiration()).before(new Date());
   }
 
   private String extractTokenType(String token) {
