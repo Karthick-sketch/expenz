@@ -41,4 +41,8 @@ public class Expense implements Serializable {
   @ManyToOne(optional = false)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   private User user;
+
+  @ManyToOne
+  @JoinColumn(name = "expense_group_id", referencedColumnName = "id")
+  private ExpenseGroup expenseGroup;
 }

@@ -3,6 +3,7 @@ package com.karthick.expenz.expenses.controller;
 import com.karthick.expenz.auth.UserSession;
 import com.karthick.expenz.expenses.dto.DashboardDTO;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
+import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.service.ExpenseService;
 import java.util.List;
@@ -88,6 +89,16 @@ public class ExpenseController {
     return new ResponseEntity<>(
       expenseService.fetchDashboardData(userId()),
       HttpStatus.OK
+    );
+  }
+
+  @PostMapping("/group")
+  public ResponseEntity<ExpenseGroupDTO> createNewExpenseGroup(
+    @RequestBody ExpenseGroupDTO expenseGroupDTO
+  ) {
+    return new ResponseEntity<>(
+      expenseService.createExpenseGroup(expenseGroupDTO, userId()),
+      HttpStatus.CREATED
     );
   }
 }

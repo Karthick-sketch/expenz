@@ -4,8 +4,11 @@ import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.expenses.dto.DashboardDTO;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
+import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.entity.Expense;
+import com.karthick.expenz.expenses.entity.ExpenseGroup;
+import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
 import com.karthick.expenz.expenses.specification.ExpenseSpecification;
 import com.karthick.expenz.users.service.UserService;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class ExpenseService {
 
   private ExpenseRepository expenseRepository;
+  private ExpenseGroupRepository expenseGroupRepository;
 
   private UserService userService;
 
@@ -121,6 +125,21 @@ public class ExpenseService {
     return dashboardDTO;
   }
 
+  public ExpenseGroupDTO createExpenseGroup(
+    ExpenseGroupDTO expenseGroupDTO,
+    long userId
+  ) {
+    ExpenseGroup expenseGroup = new ExpenseGroup();
+    expenseGroup.setTitle(expenseGroupDTO.title());
+    expenseGroup.setDescription(expenseGroupDTO.description());
+    expenseGroup.setUser(userService.findUser(userId));
+    try {
+      return toExpenseGroupDTO(expenseGroupRepository.save(expenseGroup));
+    } catch (Exception ex) {
+      throw new BadRequestException(ex.getMessage());
+    }
+  }
+
   private Specification<Expense> buildSpecification(
     long userId,
     Integer month,
@@ -165,6 +184,36 @@ public class ExpenseService {
       expense.getCategory(),
       expense.isIncome(),
       expense.getDateAdded()
+    );
+  }
+
+  private ExpenseGroupDTO toExpenseGroupDTO(ExpenseGroup expenseGroup) {
+    Long expenseCount = expenseRepository.countByIncomeAndUserId(
+      false,
+      expenseGroup.getId()
+    );
+    Long incomeCount = expenseRepository.countByIncomeAndUserId(
+      true,
+      expenseGroup.getId()
+    );
+    Double totalExpensesAmount = expenseRepository.getTotalExpensesInGroup(
+      expenseGroup.getId(),
+      false
+    );
+    Double totalIncomesAmount = expenseRepository.getTotalExpensesInGroup(
+      expenseGroup.getId(),
+      true
+    );
+    Double balanceAmount = totalIncomesAmount - totalExpensesAmount;
+    return new ExpenseGroupDTO(
+      expenseGroup.getId(),
+      expenseGroup.getTitle(),
+      expenseGroup.getDescription(),
+      expenseCount,
+      incomeCount,
+      totalExpensesAmount,
+      totalIncomesAmount,
+      balanceAmount
     );
   }
 }
