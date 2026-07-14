@@ -80,10 +80,12 @@ public class ExpenseService {
   ) {
     Expense expense = findExpense(id, userId);
     expense.setAmount(updatedExpense.amount());
+    expense.setCurrencyCode(updatedExpense.currencyCode());
     expense.setTitle(updatedExpense.title());
     expense.setDescription(updatedExpense.description());
     expense.setCategory(updatedExpense.category());
-    expense.setIncome(updatedExpense.isIncome());
+    expense.setIncome(updatedExpense.income());
+    expense.setDateAdded(updatedExpense.dateAdded());
     try {
       return toExpenseDTO(expenseRepository.save(expense));
     } catch (Exception ex) {
@@ -95,7 +97,7 @@ public class ExpenseService {
     expenseRepository.delete(findExpense(id, userId));
   }
 
-  public DashboardDTO getDashboardData(Long userId) {
+  public DashboardDTO fetchDashboardData(Long userId) {
     Double totalExpenses = expenseRepository.getTotalExpenses(userId, false);
     Double totalIncome = expenseRepository.getTotalExpenses(userId, true);
     Double balance = totalIncome - totalExpenses;

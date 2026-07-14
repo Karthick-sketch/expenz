@@ -84,9 +84,9 @@ public class ExpensesController {
   }
 
   @GetMapping("/dashboard")
-  public ResponseEntity<DashboardDTO> getDashboard() {
+  public ResponseEntity<DashboardDTO> getDashboardData() {
     return new ResponseEntity<>(
-      expenseService.getDashboardData(userId()),
+      expenseService.fetchDashboardData(userId()),
       HttpStatus.OK
     );
   }
