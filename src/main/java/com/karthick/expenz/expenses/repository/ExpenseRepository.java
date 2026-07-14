@@ -19,7 +19,7 @@ public interface ExpenseRepository
   Long countByIncomeAndUserId(boolean income, Long userId);
 
   @Query(
-    "SELECT SUM(e.amount) FROM Expense e WHERE e.user.id = :userId AND e.income = :income"
+    "SELECT COALESCE(SUM(e.amount), 0.0) FROM Expense e WHERE e.user.id = :userId AND e.income = :income"
   )
   Double getTotalExpenses(
     @Param("userId") Long userId,

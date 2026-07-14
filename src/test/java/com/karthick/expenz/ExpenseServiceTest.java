@@ -224,10 +224,12 @@ public class ExpenseServiceTest {
 
     ExpenseUpdateDTO updatedFields = new ExpenseUpdateDTO(
       45_000.0,
+      mockExpense.getCurrencyCode(),
       mockExpense.getTitle(),
       mockExpense.getDescription(),
       mockExpense.getCategory(),
-      mockExpense.isIncome()
+      mockExpense.isIncome(),
+      mockExpense.getDateAdded()
     );
     ExpenseDTO validExpense = expenseService.updateExpense(
       mockExpense.getId(),
