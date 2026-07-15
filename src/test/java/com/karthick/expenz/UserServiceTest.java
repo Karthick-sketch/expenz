@@ -133,4 +133,36 @@ public class UserServiceTest {
     assertThrows(EntityNotFoundException.class, wrongId);
     verify(userRepository, times(1)).delete(mockUser);
   }
+
+  @Test
+  public void testFindUserDTO() {
+    User mockUser = getTestUserData();
+    when(userRepository.findById(mockUser.getId())).thenReturn(
+      Optional.of(mockUser)
+    );
+
+    UserDTO dto = userService.findUserDTO(mockUser.getId());
+    Executable wrongId = () -> userService.findUserDTO(2);
+
+    assertEquals(mockUser.getId(), dto.getId());
+    assertEquals(mockUser.getName(), dto.getName());
+    assertEquals(mockUser.getEmail(), dto.getEmail());
+    assertThrows(EntityNotFoundException.class, wrongId);
+  }
+
+  @Test
+  public void testFindUserDTOByEmail() {
+    User mockUser = getTestUserData();
+    when(userRepository.findByEmailIgnoreCase(mockUser.getEmail())).thenReturn(
+      Optional.of(mockUser)
+    );
+
+    UserDTO dto = userService.findUserDTOByEmail(mockUser.getEmail());
+    Executable wrongEmail = () -> userService.findUserDTOByEmail("unknown@example.com");
+
+    assertEquals(mockUser.getId(), dto.getId());
+    assertEquals(mockUser.getName(), dto.getName());
+    assertEquals(mockUser.getEmail(), dto.getEmail());
+    assertThrows(EntityNotFoundException.class, wrongEmail);
+  }
 }

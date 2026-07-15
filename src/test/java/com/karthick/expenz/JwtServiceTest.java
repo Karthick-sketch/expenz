@@ -83,4 +83,56 @@ public class JwtServiceTest {
     assertTrue(jwtService.isAccessToken(token));
     assertFalse(jwtService.isRefreshToken(token));
   }
+
+  @Test
+  public void testGenerateAndValidateRefreshToken() {
+    when(jwtProperties.getSecret()).thenReturn(BASE64_SECRET);
+    when(jwtProperties.getRefreshTokenExpiration()).thenReturn(604_800_000L); // 7 days
+
+    String token = jwtService.generateRefreshToken(testUser);
+    assertNotNull(token);
+
+    String email = jwtService.extractEmail(token);
+    assertEquals("user@example.com", email);
+    assertTrue(jwtService.isTokenValid(token, testUser));
+    assertTrue(jwtService.isRefreshToken(token));
+    assertFalse(jwtService.isAccessToken(token));
+  }
+
+  @Test
+  public void testIsTokenValid_returnsFalse_forWrongUser() {
+    when(jwtProperties.getSecret()).thenReturn(BASE64_SECRET);
+    when(jwtProperties.getAccessTokenExpiration()).thenReturn(900_000L);
+
+    String token = jwtService.generateAccessToken(testUser);
+
+    UserDetails anotherUser = new org.springframework.security.core.userdetails.User(
+      "other@example.com", "password",
+      java.util.Collections.emptyList()
+    );
+
+    assertFalse(jwtService.isTokenValid(token, anotherUser));
+  }
+
+  @Test
+  public void testIsTokenValid_returnsFalse_forExpiredToken() {
+    when(jwtProperties.getSecret()).thenReturn(BASE64_SECRET);
+    // Expiration of -1ms means the token is already expired when created
+    when(jwtProperties.getAccessTokenExpiration()).thenReturn(-1L);
+
+    String token = jwtService.generateAccessToken(testUser);
+
+    // JJWT throws ExpiredJwtException at parse time rather than returning false
+    assertThrows(
+      io.jsonwebtoken.ExpiredJwtException.class,
+      () -> jwtService.isTokenValid(token, testUser)
+    );
+  }
+
+  @Test
+  public void testGetAccessTokenExpiration() {
+    when(jwtProperties.getAccessTokenExpiration()).thenReturn(900_000L);
+
+    assertEquals(900_000L, jwtService.getAccessTokenExpiration());
+  }
 }

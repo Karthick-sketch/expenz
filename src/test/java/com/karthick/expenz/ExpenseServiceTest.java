@@ -8,6 +8,11 @@ import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.entity.Expense;
+import com.karthick.expenz.expenses.dto.ExpenseGroupCreateDTO;
+import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
+import com.karthick.expenz.expenses.dto.ExpenseGroupListDTO;
+import com.karthick.expenz.expenses.entity.ExpenseGroup;
+import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
 import com.karthick.expenz.expenses.service.ExpenseService;
 import com.karthick.expenz.users.entity.User;
@@ -30,12 +35,23 @@ public class ExpenseServiceTest {
   private ExpenseRepository expenseRepository;
 
   @Mock
+  private ExpenseGroupRepository expenseGroupRepository;
+
+  @Mock
   private UserService userService;
 
   @InjectMocks
   private ExpenseService expenseService;
 
   private final LocalDate date = LocalDate.now();
+
+  private ExpenseGroup getTestExpenseGroupData() {
+    ExpenseGroup group = new ExpenseGroup();
+    group.setId(1L);
+    group.setTitle("Gaming");
+    group.setDescription("Gaming expenses");
+    return group;
+  }
 
   private Expense getTestExpenseData() {
     Expense expense = new Expense();
@@ -54,6 +70,8 @@ public class ExpenseServiceTest {
     user.setPassword("gta5");
     expense.setUser(user);
 
+    expense.setExpenseGroup(getTestExpenseGroupData());
+
     return expense;
   }
 
@@ -65,6 +83,7 @@ public class ExpenseServiceTest {
     dto.setTitle("Playstation 5");
     dto.setDescription("Play next generation games");
     dto.setDateAdded(date);
+    dto.setExpenseGroupId(1L);
     return dto;
   }
 
@@ -201,6 +220,9 @@ public class ExpenseServiceTest {
       mockExpense.getUser()
     );
     when(expenseRepository.save(any(Expense.class))).thenReturn(mockExpense);
+    when(expenseGroupRepository.findById(1L)).thenReturn(
+      Optional.of(mockExpense.getExpenseGroup())
+    );
 
     ExpenseDTO expense = expenseService.createExpense(
       mockExpenseDTO,
@@ -274,5 +296,106 @@ public class ExpenseServiceTest {
     assertThrows(EntityNotFoundException.class, wrongId);
     assertThrows(EntityNotFoundException.class, wrongUserId);
     verify(expenseRepository, times(1)).delete(mockExpense);
+  }
+
+  @Test
+  public void testFetchDashboardData() {
+    Expense mockExpense = getTestExpenseData();
+    long userId = mockExpense.getUser().getId();
+
+    when(expenseRepository.getTotalExpenses(userId, false)).thenReturn(50_000.0);
+    when(expenseRepository.getTotalExpenses(userId, true)).thenReturn(100_000.0);
+    when(expenseRepository.countByIncomeAndUserId(false, userId)).thenReturn(1L);
+    when(expenseRepository.countByIncomeAndUserId(true, userId)).thenReturn(2L);
+    when(expenseRepository.getRecentExpenses(userId)).thenReturn(List.of(mockExpense));
+
+    var dashboard = expenseService.fetchDashboardData(userId);
+
+    assertEquals(50_000.0, dashboard.getTotalExpenses(), 0.001);
+    assertEquals(100_000.0, dashboard.getTotalIncome(), 0.001);
+    assertEquals(50_000.0, dashboard.getBalance(), 0.001);
+    assertEquals(1L, dashboard.getTotalExpenseCount());
+    assertEquals(2L, dashboard.getTotalIncomeCount());
+    assertEquals(1, dashboard.getRecentExpenses().size());
+    assertExpenseEqualsDTO(mockExpense, dashboard.getRecentExpenses().get(0));
+  }
+
+  @Test
+  public void testCreateExpenseGroup() {
+    Expense mockExpense = getTestExpenseData();
+    ExpenseGroup mockGroup = getTestExpenseGroupData();
+    mockGroup.setUser(mockExpense.getUser());
+
+    when(userService.findUser(mockExpense.getUser().getId())).thenReturn(mockExpense.getUser());
+    when(expenseGroupRepository.save(any(ExpenseGroup.class))).thenReturn(mockGroup);
+    // groups with no expenses yet
+    mockGroup.setExpenses(List.of());
+
+    ExpenseGroupCreateDTO createDTO = new ExpenseGroupCreateDTO("Gaming", "Gaming expenses");
+    ExpenseGroupDTO result = expenseService.createExpenseGroup(createDTO, mockExpense.getUser().getId());
+
+    assertEquals(mockGroup.getId(), result.id());
+    assertEquals(mockGroup.getTitle(), result.title());
+    assertEquals(mockGroup.getDescription(), result.description());
+    assertEquals(0, result.totalExpensesCount());
+    assertEquals(0, result.totalIncomesCount());
+    verify(expenseGroupRepository, times(1)).save(any(ExpenseGroup.class));
+  }
+
+  @Test
+  public void testFetchExpenseGroups() {
+    Expense mockExpense = getTestExpenseData();
+    ExpenseGroup mockGroup = getTestExpenseGroupData();
+    long userId = mockExpense.getUser().getId();
+
+    when(expenseGroupRepository.findByUserId(userId)).thenReturn(List.of(mockGroup));
+    when(expenseRepository.countByIncomeAndUserId(false, mockGroup.getId())).thenReturn(3L);
+    when(expenseRepository.countByIncomeAndUserId(true, mockGroup.getId())).thenReturn(1L);
+    when(expenseRepository.getTotalExpensesInGroup(mockGroup.getId(), false)).thenReturn(150_000.0);
+    when(expenseRepository.getTotalExpensesInGroup(mockGroup.getId(), true)).thenReturn(200_000.0);
+
+    List<ExpenseGroupListDTO> groups = expenseService.fetchExpenseGroups(userId);
+
+    assertEquals(1, groups.size());
+    ExpenseGroupListDTO dto = groups.get(0);
+    assertEquals(mockGroup.getId(), dto.id());
+    assertEquals(mockGroup.getTitle(), dto.title());
+    assertEquals(3L, dto.expenseCount());
+    assertEquals(1L, dto.incomeCount());
+    assertEquals(150_000.0, dto.totalExpensesAmount(), 0.001);
+    assertEquals(200_000.0, dto.totalIncomesAmount(), 0.001);
+    assertEquals(50_000.0, dto.balanceAmount(), 0.001);
+  }
+
+  @Test
+  public void testFetchExpenseGroupDTO() {
+    Expense mockExpense = getTestExpenseData();
+    ExpenseGroup mockGroup = getTestExpenseGroupData();
+    mockGroup.setExpenses(List.of(mockExpense));
+    long userId = mockExpense.getUser().getId();
+
+    when(
+      expenseGroupRepository.findByIdAndUserId(mockGroup.getId(), userId)
+    ).thenReturn(Optional.of(mockGroup));
+
+    ExpenseGroupDTO result = expenseService.fetchExpenseGroupDTO(mockGroup.getId(), userId);
+
+    assertEquals(mockGroup.getId(), result.id());
+    assertEquals(mockGroup.getTitle(), result.title());
+    // one expense (income=false)
+    assertEquals(1L, result.totalExpensesCount());
+    assertEquals(0L, result.totalIncomesCount());
+    assertEquals(mockExpense.getAmount(), result.totalExpensesAmount(), 0.001);
+    assertEquals(0.0, result.totalIncomesAmount(), 0.001);
+  }
+
+  @Test
+  public void testFetchExpenseGroupDTO_notFound() {
+    when(expenseGroupRepository.findByIdAndUserId(99L, 1L)).thenReturn(Optional.empty());
+
+    assertThrows(
+      EntityNotFoundException.class,
+      () -> expenseService.fetchExpenseGroupDTO(99L, 1L)
+    );
   }
 }
