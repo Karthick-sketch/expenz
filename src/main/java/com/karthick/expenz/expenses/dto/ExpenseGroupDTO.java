@@ -1,12 +1,15 @@
 package com.karthick.expenz.expenses.dto;
 
+import java.util.List;
+
 public record ExpenseGroupDTO(
-  Long id,
+  long id,
   String title,
   String description,
-  Long expenseCount,
-  Long incomeCount,
-  Double totalExpensesAmount,
-  Double totalIncomesAmount,
-  Double balanceAmount
+  long totalExpensesCount,
+  long totalIncomesCount,
+  double totalExpensesAmount,
+  double totalIncomesAmount,
+  double balanceAmount,
+  List<ExpenseDTO> expenses
 ) {}

@@ -5,6 +5,7 @@ import com.karthick.expenz.expenses.dto.DashboardDTO;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupCreateDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
+import com.karthick.expenz.expenses.dto.ExpenseGroupListDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.service.ExpenseService;
 import java.util.List;
@@ -104,7 +105,7 @@ public class ExpenseController {
   }
 
   @GetMapping("/groups")
-  public ResponseEntity<List<ExpenseGroupDTO>> getExpenseGroups() {
+  public ResponseEntity<List<ExpenseGroupListDTO>> getExpenseGroups() {
     return new ResponseEntity<>(
       expenseService.fetchExpenseGroups(userId()),
       HttpStatus.OK

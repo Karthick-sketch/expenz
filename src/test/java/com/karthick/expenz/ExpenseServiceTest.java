@@ -229,7 +229,8 @@ public class ExpenseServiceTest {
       mockExpense.getDescription(),
       mockExpense.getCategory(),
       mockExpense.isIncome(),
-      mockExpense.getDateAdded()
+      mockExpense.getDateAdded(),
+      mockExpense.getExpenseGroup().getId()
     );
     ExpenseDTO validExpense = expenseService.updateExpense(
       mockExpense.getId(),

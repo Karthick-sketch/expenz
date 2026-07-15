@@ -40,4 +40,6 @@ public interface ExpenseRepository
     "SELECT e FROM Expense e WHERE e.user.id = :userId ORDER BY e.dateAdded DESC LIMIT 5"
   )
   List<Expense> getRecentExpenses(@Param("userId") Long userId);
+
+  List<Expense> findByExpenseGroupId(Long expenseGroupId);
 }

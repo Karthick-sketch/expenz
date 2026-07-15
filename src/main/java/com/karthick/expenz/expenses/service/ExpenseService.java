@@ -6,6 +6,7 @@ import com.karthick.expenz.expenses.dto.DashboardDTO;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupCreateDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
+import com.karthick.expenz.expenses.dto.ExpenseGroupListDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.entity.ExpenseGroup;
@@ -50,7 +51,7 @@ public class ExpenseService {
       null
     );
     try {
-      return getExpensesDTO(expenseRepository.findAll(spec));
+      return getExpenseDTOs(expenseRepository.findAll(spec));
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());
     }
@@ -63,7 +64,7 @@ public class ExpenseService {
     long userId
   ) {
     Specification<Expense> spec = buildSpecification(userId, month, year, type);
-    return getExpensesDTO(expenseRepository.findAll(spec));
+    return getExpenseDTOs(expenseRepository.findAll(spec));
   }
 
   public Expense findExpense(long id, long userId) {
@@ -122,7 +123,7 @@ public class ExpenseService {
     dashboardDTO.setTotalIncome(totalIncome);
     dashboardDTO.setTotalExpenseCount(totalExpenseCount);
     dashboardDTO.setTotalIncomeCount(totalIncomeCount);
-    dashboardDTO.setRecentExpenses(getExpensesDTO(recentExpenses));
+    dashboardDTO.setRecentExpenses(getExpenseDTOs(recentExpenses));
     return dashboardDTO;
   }
 
@@ -141,11 +142,11 @@ public class ExpenseService {
     }
   }
 
-  public List<ExpenseGroupDTO> fetchExpenseGroups(long userId) {
+  public List<ExpenseGroupListDTO> fetchExpenseGroups(long userId) {
     return expenseGroupRepository
       .findByUserId(userId)
       .stream()
-      .map(this::toExpenseGroupDTO)
+      .map(this::toExpenseGroupListDTO)
       .toList();
   }
 
@@ -172,7 +173,7 @@ public class ExpenseService {
       .and(ExpenseSpecification.withExpenseType(type));
   }
 
-  private List<ExpenseDTO> getExpensesDTO(List<Expense> expenses) {
+  private List<ExpenseDTO> getExpenseDTOs(List<Expense> expenses) {
     if (expenses == null || expenses.isEmpty()) {
       return Collections.emptyList();
     }
@@ -209,6 +210,35 @@ public class ExpenseService {
   }
 
   private ExpenseGroupDTO toExpenseGroupDTO(ExpenseGroup expenseGroup) {
+    List<ExpenseDTO> expenseDTOs = getExpenseDTOs(expenseGroup.getExpenses());
+    long totalExpensesCount = 0;
+    long totalIncomeCount = 0;
+    double totalExpensesAmount = 0.0;
+    double totalIncomeAmount = 0.0;
+    for (ExpenseDTO expenseDTO : expenseDTOs) {
+      if (expenseDTO.isIncome()) {
+        totalIncomeCount++;
+        totalIncomeAmount += expenseDTO.getAmount();
+      } else {
+        totalExpensesCount++;
+        totalExpensesAmount += expenseDTO.getAmount();
+      }
+    }
+    double balanceAmount = totalIncomeAmount - totalExpensesAmount;
+    return new ExpenseGroupDTO(
+      expenseGroup.getId(),
+      expenseGroup.getTitle(),
+      expenseGroup.getDescription(),
+      totalExpensesCount,
+      totalIncomeCount,
+      totalExpensesAmount,
+      totalIncomeAmount,
+      balanceAmount,
+      expenseDTOs
+    );
+  }
+
+  private ExpenseGroupListDTO toExpenseGroupListDTO(ExpenseGroup expenseGroup) {
     Long expenseCount = expenseRepository.countByIncomeAndUserId(
       false,
       expenseGroup.getId()
@@ -226,7 +256,7 @@ public class ExpenseService {
       true
     );
     Double balanceAmount = totalIncomesAmount - totalExpensesAmount;
-    return new ExpenseGroupDTO(
+    return new ExpenseGroupListDTO(
       expenseGroup.getId(),
       expenseGroup.getTitle(),
       expenseGroup.getDescription(),
