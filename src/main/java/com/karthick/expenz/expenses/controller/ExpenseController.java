@@ -3,6 +3,7 @@ package com.karthick.expenz.expenses.controller;
 import com.karthick.expenz.auth.UserSession;
 import com.karthick.expenz.expenses.dto.DashboardDTO;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
+import com.karthick.expenz.expenses.dto.ExpenseGroupCreateDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.service.ExpenseService;
@@ -92,13 +93,31 @@ public class ExpenseController {
     );
   }
 
-  @PostMapping("/group")
+  @PostMapping("/groups")
   public ResponseEntity<ExpenseGroupDTO> createNewExpenseGroup(
-    @RequestBody ExpenseGroupDTO expenseGroupDTO
+    @RequestBody ExpenseGroupCreateDTO expenseGroupCreateDTO
   ) {
     return new ResponseEntity<>(
-      expenseService.createExpenseGroup(expenseGroupDTO, userId()),
+      expenseService.createExpenseGroup(expenseGroupCreateDTO, userId()),
       HttpStatus.CREATED
+    );
+  }
+
+  @GetMapping("/groups")
+  public ResponseEntity<List<ExpenseGroupDTO>> getExpenseGroups() {
+    return new ResponseEntity<>(
+      expenseService.fetchExpenseGroups(userId()),
+      HttpStatus.OK
+    );
+  }
+
+  @GetMapping("/groups/{id}")
+  public ResponseEntity<ExpenseGroupDTO> getExpenseGroupById(
+    @PathVariable("id") long id
+  ) {
+    return new ResponseEntity<>(
+      expenseService.fetchExpenseGroupDTO(id, userId()),
+      HttpStatus.OK
     );
   }
 }

@@ -9,5 +9,6 @@ public record ExpenseUpdateDTO(
   String description,
   String category,
   boolean income,
-  LocalDate dateAdded
+  LocalDate dateAdded,
+  Long expenseGroupId
 ) {}

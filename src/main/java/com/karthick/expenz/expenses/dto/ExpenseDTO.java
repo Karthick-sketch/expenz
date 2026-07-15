@@ -20,4 +20,5 @@ public class ExpenseDTO {
   private String category;
   private boolean income;
   private LocalDate dateAdded;
+  private Long expenseGroupId;
 }

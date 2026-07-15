@@ -4,6 +4,7 @@ import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.expenses.dto.DashboardDTO;
 import com.karthick.expenz.expenses.dto.ExpenseDTO;
+import com.karthick.expenz.expenses.dto.ExpenseGroupCreateDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.entity.Expense;
@@ -126,18 +127,34 @@ public class ExpenseService {
   }
 
   public ExpenseGroupDTO createExpenseGroup(
-    ExpenseGroupDTO expenseGroupDTO,
+    ExpenseGroupCreateDTO expenseGroupCreateDTO,
     long userId
   ) {
     ExpenseGroup expenseGroup = new ExpenseGroup();
-    expenseGroup.setTitle(expenseGroupDTO.title());
-    expenseGroup.setDescription(expenseGroupDTO.description());
+    expenseGroup.setTitle(expenseGroupCreateDTO.title());
+    expenseGroup.setDescription(expenseGroupCreateDTO.description());
     expenseGroup.setUser(userService.findUser(userId));
     try {
       return toExpenseGroupDTO(expenseGroupRepository.save(expenseGroup));
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());
     }
+  }
+
+  public List<ExpenseGroupDTO> fetchExpenseGroups(long userId) {
+    return expenseGroupRepository
+      .findByUserId(userId)
+      .stream()
+      .map(this::toExpenseGroupDTO)
+      .toList();
+  }
+
+  public ExpenseGroupDTO fetchExpenseGroupDTO(long id, long userId) {
+    return toExpenseGroupDTO(
+      expenseGroupRepository
+        .findByIdAndUserId(id, userId)
+        .orElseThrow(() -> new EntityNotFoundException(id, ExpenseGroup.class))
+    );
   }
 
   private Specification<Expense> buildSpecification(
@@ -171,6 +188,9 @@ public class ExpenseService {
     expense.setCategory(expenseDTO.getCategory());
     expense.setIncome(expenseDTO.isIncome());
     expense.setDateAdded(expenseDTO.getDateAdded());
+    expense.setExpenseGroup(
+      expenseGroupRepository.findById(expenseDTO.getExpenseGroupId()).get()
+    );
     return expense;
   }
 
@@ -183,7 +203,8 @@ public class ExpenseService {
       expense.getDescription(),
       expense.getCategory(),
       expense.isIncome(),
-      expense.getDateAdded()
+      expense.getDateAdded(),
+      expense.getExpenseGroup().getId()
     );
   }
 
