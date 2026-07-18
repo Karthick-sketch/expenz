@@ -205,7 +205,7 @@ public class ExpenseService {
       expense.getCategory(),
       expense.isIncome(),
       expense.getDateAdded(),
-      expense.getExpenseGroup().getId()
+      expense.getExpenseGroupId()
     );
   }
 

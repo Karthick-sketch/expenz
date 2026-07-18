@@ -45,4 +45,8 @@ public class Expense implements Serializable {
   @ManyToOne
   @JoinColumn(name = "expense_group_id", referencedColumnName = "id")
   private ExpenseGroup expenseGroup;
+
+  public Long getExpenseGroupId() {
+    return this.expenseGroup != null ? this.expenseGroup.getId() : null;
+  }
 }
