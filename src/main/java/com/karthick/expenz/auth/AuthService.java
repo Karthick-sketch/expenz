@@ -44,7 +44,8 @@ public class AuthService {
       UserCreateDTO newUser = new UserCreateDTO(
         request.getName(),
         request.getEmail().toLowerCase(),
-        request.getPassword()
+        request.getPassword(),
+        request.getCurrencyCode()
       );
       userService.createUser(newUser);
       return buildAuthResponse(newUser.getEmail());

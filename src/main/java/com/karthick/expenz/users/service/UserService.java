@@ -73,10 +73,20 @@ public class UserService {
   }
 
   private User toUser(UserCreateDTO user) {
-    return new User(user.getName(), user.getEmail(), user.getPassword());
+    return new User(
+      user.getName(),
+      user.getEmail(),
+      user.getPassword(),
+      user.getCurrencyCode()
+    );
   }
 
   private UserDTO toUserDTO(User user) {
-    return new UserDTO(user.getId(), user.getName(), user.getEmail());
+    return new UserDTO(
+      user.getId(),
+      user.getName(),
+      user.getEmail(),
+      user.getCurrencyCode()
+    );
   }
 }

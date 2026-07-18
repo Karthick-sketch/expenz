@@ -20,9 +20,6 @@ public class Expense implements Serializable {
   @Column(name = "amount", nullable = false)
   private double amount;
 
-  @Column(name = "currency_code", nullable = false)
-  private String currencyCode;
-
   @Column(name = "title", nullable = false)
   private String title;
 

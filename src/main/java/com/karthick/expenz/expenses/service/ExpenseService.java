@@ -37,7 +37,6 @@ public class ExpenseService {
       expense.setUser(userService.findUser(userId));
       return toExpenseDTO(expenseRepository.save(expense));
     } catch (Exception ex) {
-      ex.printStackTrace();
       throw new BadRequestException(ex.getMessage());
     }
   }
@@ -86,7 +85,6 @@ public class ExpenseService {
   ) {
     Expense expense = findExpense(id, userId);
     expense.setAmount(updatedExpense.amount());
-    expense.setCurrencyCode(updatedExpense.currencyCode());
     expense.setTitle(updatedExpense.title());
     expense.setDescription(updatedExpense.description());
     expense.setCategory(updatedExpense.category());
@@ -183,15 +181,16 @@ public class ExpenseService {
   private Expense toExpense(ExpenseDTO expenseDTO) {
     Expense expense = new Expense();
     expense.setAmount(expenseDTO.getAmount());
-    expense.setCurrencyCode(expenseDTO.getCurrencyCode());
     expense.setTitle(expenseDTO.getTitle());
     expense.setDescription(expenseDTO.getDescription());
     expense.setCategory(expenseDTO.getCategory());
     expense.setIncome(expenseDTO.isIncome());
     expense.setDateAdded(expenseDTO.getDateAdded());
-    expense.setExpenseGroup(
-      expenseGroupRepository.findById(expenseDTO.getExpenseGroupId()).get()
-    );
+    if (expenseDTO.getExpenseGroupId() != null) {
+      expense.setExpenseGroup(
+        expenseGroupRepository.findById(expenseDTO.getExpenseGroupId()).get()
+      );
+    }
     return expense;
   }
 
@@ -199,7 +198,6 @@ public class ExpenseService {
     return new ExpenseDTO(
       expense.getId(),
       expense.getAmount(),
-      expense.getCurrencyCode(),
       expense.getTitle(),
       expense.getDescription(),
       expense.getCategory(),

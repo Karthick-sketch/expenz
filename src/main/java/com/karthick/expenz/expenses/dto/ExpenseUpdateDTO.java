@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 public record ExpenseUpdateDTO(
   double amount,
-  String currencyCode,
   String title,
   String description,
   String category,

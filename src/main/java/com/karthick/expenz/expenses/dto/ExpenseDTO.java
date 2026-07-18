@@ -14,7 +14,6 @@ public class ExpenseDTO {
 
   private Long id;
   private double amount;
-  private String currencyCode;
   private String title;
   private String description;
   private String category;

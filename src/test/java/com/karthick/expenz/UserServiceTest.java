@@ -38,11 +38,17 @@ public class UserServiceTest {
     user.setName("Kang");
     user.setEmail("kang@marvel.com");
     user.setPassword("encrypted password");
+    user.setCurrencyCode("USD");
     return user;
   }
 
   private UserCreateDTO getTestUserCreateDTOData() {
-    return new UserCreateDTO("kang", "kang@marvel.com", "encrypted password");
+    return new UserCreateDTO(
+      "kang",
+      "kang@marvel.com",
+      "encrypted password",
+      "USD"
+    );
   }
 
   @Test
@@ -108,7 +114,8 @@ public class UserServiceTest {
     UserUpdateDTO updatedFields = new UserUpdateDTO(
       mockUser.getName(),
       "kangtheconqueror@marvel.com",
-      "newpassword"
+      "newpassword",
+      "USD"
     );
     UserDTO validUser = userService.updateUser(mockUser.getId(), updatedFields);
     Executable wrongId = () -> userService.updateUser(2, updatedFields);
@@ -158,7 +165,8 @@ public class UserServiceTest {
     );
 
     UserDTO dto = userService.findUserDTOByEmail(mockUser.getEmail());
-    Executable wrongEmail = () -> userService.findUserDTOByEmail("unknown@example.com");
+    Executable wrongEmail = () ->
+      userService.findUserDTOByEmail("unknown@example.com");
 
     assertEquals(mockUser.getId(), dto.getId());
     assertEquals(mockUser.getName(), dto.getName());

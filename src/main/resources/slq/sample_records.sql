@@ -5,12 +5,14 @@ INSERT INTO
         "name",
         "email",
         "password",
+        "currency_code",
         "active"
     )
 VALUES (
         'Test User',
         'testuser@example.com',
         '$2a$10$NEP0D4hyLzX/pm47l55C1ONTtsOtdGWeqXHcAO10E6UGj4esOwZEK',
+        'USD',
         true
     )
 ON CONFLICT (email) DO NOTHING;
@@ -47,7 +49,6 @@ WHERE
 INSERT INTO
     expenses (
         amount,
-        currency_code,
         title,
         description,
         category,
@@ -60,7 +61,6 @@ VALUES
     -- Group: Travel
     (
         120.50,
-        'USD',
         'Flight Ticket',
         'One-way ticket to NY',
         'Travel',
@@ -82,7 +82,6 @@ VALUES
     ),
     (
         45.00,
-        'USD',
         'Uber Ride',
         'Ride to the hotel',
         'Travel',
@@ -104,7 +103,6 @@ VALUES
     ),
     (
         350.00,
-        'USD',
         'Hotel Stay',
         '3 nights at Downtown Hotel',
         'Travel',
@@ -126,7 +124,6 @@ VALUES
     ),
     (
         25.00,
-        'USD',
         'Subway Pass',
         'Weekly subway pass',
         'Travel',
@@ -148,7 +145,6 @@ VALUES
     ),
     (
         85.00,
-        'USD',
         'Museum Tour',
         'Guided tour of Metropolitan Museum',
         'Travel',
@@ -172,7 +168,6 @@ VALUES
 -- Group: Groceries
 (
     64.20,
-    'USD',
     'Weekly Groceries',
     'Milk, eggs, vegetables, and bread',
     'Groceries',
@@ -194,7 +189,6 @@ VALUES
 ),
 (
     18.50,
-    'USD',
     'Coffee Beans',
     'Premium roasted coffee beans',
     'Groceries',
@@ -216,7 +210,6 @@ VALUES
 ),
 (
     42.10,
-    'USD',
     'Snacks and Drinks',
     'Soda, chips, and cookies for party',
     'Groceries',
@@ -238,7 +231,6 @@ VALUES
 ),
 (
     12.80,
-    'USD',
     'Fresh Fruits',
     'Apples, bananas, and strawberries',
     'Groceries',
@@ -260,7 +252,6 @@ VALUES
 ),
 (
     55.00,
-    'USD',
     'Organic Vegetables',
     'Assorted organic greens',
     'Groceries',
@@ -284,7 +275,6 @@ VALUES
 -- Group: Entertainment
 (
     15.99,
-    'USD',
     'Netflix Subscription',
     'Monthly premium plan',
     'Entertainment',
@@ -306,7 +296,6 @@ VALUES
 ),
 (
     60.00,
-    'USD',
     'Concert Ticket',
     'Rock band live concert',
     'Entertainment',
@@ -328,7 +317,6 @@ VALUES
 ),
 (
     70.00,
-    'USD',
     'Video Game',
     'Pre-ordered new RPG game',
     'Entertainment',
@@ -350,7 +338,6 @@ VALUES
 ),
 (
     30.00,
-    'USD',
     'Cinema Tickets',
     'Tickets for 2 people with popcorn',
     'Entertainment',
@@ -372,7 +359,6 @@ VALUES
 ),
 (
     9.99,
-    'USD',
     'Spotify Premium',
     'Monthly music streaming subscription',
     'Entertainment',
@@ -396,7 +382,6 @@ VALUES
 -- Group: Utilities
 (
     85.40,
-    'USD',
     'Electricity Bill',
     'Power usage for June',
     'Utilities',
@@ -418,7 +403,6 @@ VALUES
 ),
 (
     30.00,
-    'USD',
     'Water Bill',
     'Water usage for June',
     'Utilities',
@@ -440,7 +424,6 @@ VALUES
 ),
 (
     50.00,
-    'USD',
     'Internet Service',
     'High-speed fiber connection',
     'Utilities',
@@ -462,7 +445,6 @@ VALUES
 ),
 (
     15.00,
-    'USD',
     'Gas Bill',
     'Gas utility charge',
     'Utilities',
@@ -484,7 +466,6 @@ VALUES
 ),
 (
     45.00,
-    'USD',
     'Mobile Phone Plan',
     'Unlimited talk and data plan',
     'Utilities',
@@ -508,7 +489,6 @@ VALUES
 -- Group: Fitness
 (
     50.00,
-    'USD',
     'Gym Membership',
     'Monthly gym pass',
     'Fitness',
@@ -530,7 +510,6 @@ VALUES
 ),
 (
     120.00,
-    'USD',
     'Running Shoes',
     'Athletic training shoes',
     'Fitness',
@@ -552,7 +531,6 @@ VALUES
 ),
 (
     35.00,
-    'USD',
     'Whey Protein',
     '1kg chocolate protein powder',
     'Fitness',
@@ -574,7 +552,6 @@ VALUES
 ),
 (
     15.00,
-    'USD',
     'Yoga Mat',
     'Non-slip yoga mat',
     'Fitness',
@@ -596,7 +573,6 @@ VALUES
 ),
 (
     28.00,
-    'USD',
     'Resistance Bands',
     'Set of 5 resistance bands',
     'Fitness',
@@ -620,7 +596,6 @@ VALUES
 -- Ungrouped/Other Expenses
 (
     2500.00,
-    'USD',
     'Monthly Salary',
     'Direct deposit from employer',
     'Salary',
@@ -636,7 +611,6 @@ VALUES
 ),
 (
     45.00,
-    'USD',
     'Haircut',
     'Haircut and styling',
     'Personal Care',
@@ -652,7 +626,6 @@ VALUES
 ),
 (
     12.50,
-    'USD',
     'Lunch Out',
     'Fast food lunch',
     'Food',
@@ -668,7 +641,6 @@ VALUES
 ),
 (
     150.00,
-    'USD',
     'Birthday Gift',
     'Gift for friend',
     'Gifts',
@@ -684,7 +656,6 @@ VALUES
 ),
 (
     20.00,
-    'USD',
     'Book Purchase',
     'Fiction novel',
     'Books',

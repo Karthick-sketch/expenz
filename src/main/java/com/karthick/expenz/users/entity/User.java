@@ -31,6 +31,10 @@ public class User implements Serializable {
   @Column(name = "password", nullable = false)
   private String password;
 
+  @NonNull
+  @Column(name = "currency_code", nullable = false)
+  private String currencyCode;
+
   @Column(name = "active", nullable = false)
   private boolean active = true;
 
