@@ -12,6 +12,7 @@ import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.entity.ExpenseGroup;
 import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
+import com.karthick.expenz.expenses.repository.ExpenseSubCategoryRepository;
 import com.karthick.expenz.expenses.specification.ExpenseSpecification;
 import com.karthick.expenz.users.service.UserService;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ public class ExpenseService {
 
   private ExpenseRepository expenseRepository;
   private ExpenseGroupRepository expenseGroupRepository;
+  private ExpenseSubCategoryRepository expenseSubCategoryRepository;
 
   private UserService userService;
 
@@ -87,7 +89,9 @@ public class ExpenseService {
     expense.setAmount(updatedExpense.amount());
     expense.setTitle(updatedExpense.title());
     expense.setDescription(updatedExpense.description());
-    expense.setCategory(updatedExpense.category());
+    expenseSubCategoryRepository
+      .findByName(updatedExpense.category())
+      .ifPresent(expense::setCategory);
     expense.setIncome(updatedExpense.income());
     expense.setDateAdded(updatedExpense.dateAdded());
     try {
@@ -183,7 +187,9 @@ public class ExpenseService {
     expense.setAmount(expenseDTO.getAmount());
     expense.setTitle(expenseDTO.getTitle());
     expense.setDescription(expenseDTO.getDescription());
-    expense.setCategory(expenseDTO.getCategory());
+    expenseSubCategoryRepository
+      .findByName(expenseDTO.getCategory())
+      .ifPresent(expense::setCategory);
     expense.setIncome(expenseDTO.isIncome());
     expense.setDateAdded(expenseDTO.getDateAdded());
     if (expenseDTO.getExpenseGroupId() != null) {
@@ -200,7 +206,7 @@ public class ExpenseService {
       expense.getAmount(),
       expense.getTitle(),
       expense.getDescription(),
-      expense.getCategory(),
+      expense.getCategory() != null ? expense.getCategory().getName() : null,
       expense.isIncome(),
       expense.getDateAdded(),
       expense.getExpenseGroupId()

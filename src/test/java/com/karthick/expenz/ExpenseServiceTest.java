@@ -12,6 +12,7 @@ import com.karthick.expenz.expenses.dto.ExpenseGroupListDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.entity.ExpenseGroup;
+import com.karthick.expenz.expenses.entity.ExpenseSubCategory;
 import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
 import com.karthick.expenz.expenses.service.ExpenseService;
@@ -57,7 +58,9 @@ public class ExpenseServiceTest {
     Expense expense = new Expense();
     expense.setId(1);
     expense.setAmount(50_000.0);
-    expense.setCategory("electronics");
+    ExpenseSubCategory category = new ExpenseSubCategory();
+    category.setName("electronics");
+    expense.setCategory(category);
     expense.setIncome(false);
     expense.setTitle("Playstation 5");
     expense.setDescription("Play next generation games");
@@ -248,7 +251,7 @@ public class ExpenseServiceTest {
       45_000.0,
       mockExpense.getTitle(),
       mockExpense.getDescription(),
-      mockExpense.getCategory(),
+      mockExpense.getCategory().getName(),
       mockExpense.isIncome(),
       mockExpense.getDateAdded(),
       mockExpense.getExpenseGroup().getId()

@@ -1,13 +1,9 @@
 package com.karthick.expenz.expenses.controller;
 
 import com.karthick.expenz.auth.UserSession;
-import com.karthick.expenz.expenses.dto.DashboardDTO;
-import com.karthick.expenz.expenses.dto.ExpenseDTO;
-import com.karthick.expenz.expenses.dto.ExpenseGroupCreateDTO;
-import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
-import com.karthick.expenz.expenses.dto.ExpenseGroupListDTO;
-import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
-import com.karthick.expenz.expenses.service.ExpenseService;
+import com.karthick.expenz.expenses.dto.*;
+import com.karthick.expenz.expenses.dto.category.*;
+import com.karthick.expenz.expenses.service.*;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class ExpenseController {
 
   private final ExpenseService expenseService;
+  private final ExpenseCategoryService expenseCategoryService;
 
   private final UserSession userSession;
 
@@ -118,6 +115,34 @@ public class ExpenseController {
   ) {
     return new ResponseEntity<>(
       expenseService.fetchExpenseGroupDTO(id, userId()),
+      HttpStatus.OK
+    );
+  }
+
+  @GetMapping("/categories")
+  public ResponseEntity<List<ExpenseCategoryDTO>> getCategories() {
+    return new ResponseEntity<>(
+      expenseCategoryService.getAllCategories(),
+      HttpStatus.OK
+    );
+  }
+
+  @PostMapping("/categories")
+  public ResponseEntity<ExpenseCategoryDTO> createNewCategory(
+    @RequestBody ExpenseCategoryCreateDTO expenseCategoryCreateDTO
+  ) {
+    return new ResponseEntity<>(
+      expenseCategoryService.createCategory(expenseCategoryCreateDTO),
+      HttpStatus.CREATED
+    );
+  }
+
+  @GetMapping("/categories/{id}/sub-categories")
+  public ResponseEntity<List<ExpenseSubCategoryDTO>> getSubCategoryById(
+    @PathVariable("id") long id
+  ) {
+    return new ResponseEntity<>(
+      expenseCategoryService.getAllSubCategories(id),
       HttpStatus.OK
     );
   }

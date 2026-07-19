@@ -26,8 +26,9 @@ public class Expense implements Serializable {
   @Column(name = "description")
   private String description;
 
-  @Column(name = "category", nullable = false)
-  private String category;
+  @ManyToOne
+  @JoinColumn(name = "category_id", referencedColumnName = "id")
+  private ExpenseSubCategory category;
 
   @Column(name = "is_income", nullable = false)
   private boolean income;
