@@ -9,12 +9,14 @@ import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupCreateDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupListDTO;
+import com.karthick.expenz.expenses.dto.ExpenseListDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.entity.ExpenseGroup;
 import com.karthick.expenz.expenses.entity.ExpenseSubCategory;
 import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
+import com.karthick.expenz.expenses.repository.ExpenseSubCategoryRepository;
 import com.karthick.expenz.expenses.service.ExpenseService;
 import com.karthick.expenz.users.entity.User;
 import com.karthick.expenz.users.service.UserService;
@@ -37,6 +39,9 @@ public class ExpenseServiceTest {
 
   @Mock
   private ExpenseGroupRepository expenseGroupRepository;
+
+  @Mock
+  private ExpenseSubCategoryRepository expenseSubCategoryRepository;
 
   @Mock
   private UserService userService;
@@ -95,7 +100,7 @@ public class ExpenseServiceTest {
     assertEquals(expense.getAmount(), dto.getAmount(), 0.001);
     assertEquals(expense.getTitle(), dto.getTitle());
     assertEquals(expense.getDescription(), dto.getDescription());
-    assertEquals(expense.getCategory(), dto.getCategory());
+    assertEquals(expense.getCategory() != null ? expense.getCategory().getName() : null, dto.getCategory());
     assertEquals(expense.isIncome(), dto.isIncome());
     assertEquals(expense.getDateAdded(), dto.getDateAdded());
   }
@@ -156,11 +161,11 @@ public class ExpenseServiceTest {
       List.of(mockExpense)
     );
 
-    List<ExpenseDTO> validExpenses = expenseService.fetchThisMonthExpenses(
+    ExpenseListDTO validExpenses = expenseService.fetchThisMonthExpenses(
       mockExpense.getUser().getId()
     );
-    assertEquals(1, validExpenses.size());
-    assertExpenseEqualsDTO(mockExpense, validExpenses.get(0));
+    assertEquals(1, validExpenses.expenses().size());
+    assertExpenseEqualsDTO(mockExpense, validExpenses.expenses().get(0));
   }
 
   @Test
@@ -226,6 +231,9 @@ public class ExpenseServiceTest {
     when(expenseGroupRepository.findById(1L)).thenReturn(
       Optional.of(mockExpense.getExpenseGroup())
     );
+    when(expenseSubCategoryRepository.findByName(mockExpenseDTO.getCategory())).thenReturn(
+      Optional.of(mockExpense.getCategory())
+    );
 
     ExpenseDTO expense = expenseService.createExpense(
       mockExpenseDTO,
@@ -246,6 +254,9 @@ public class ExpenseServiceTest {
       )
     ).thenReturn(Optional.of(mockExpense));
     when(expenseRepository.save(mockExpense)).thenReturn(mockExpense);
+    when(expenseSubCategoryRepository.findByName(any())).thenReturn(
+      Optional.of(mockExpense.getCategory())
+    );
 
     ExpenseUpdateDTO updatedFields = new ExpenseUpdateDTO(
       45_000.0,

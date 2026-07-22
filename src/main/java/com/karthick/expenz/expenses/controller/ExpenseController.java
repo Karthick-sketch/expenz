@@ -47,7 +47,7 @@ public class ExpenseController {
   }
 
   @GetMapping("/this-month")
-  public ResponseEntity<List<ExpenseDTO>> getThisMonthExpenses() {
+  public ResponseEntity<ExpenseListDTO> getThisMonthExpenses() {
     return new ResponseEntity<>(
       expenseService.fetchThisMonthExpenses(userId()),
       HttpStatus.OK

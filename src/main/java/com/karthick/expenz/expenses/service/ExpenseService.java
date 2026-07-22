@@ -7,6 +7,7 @@ import com.karthick.expenz.expenses.dto.ExpenseDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupCreateDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
 import com.karthick.expenz.expenses.dto.ExpenseGroupListDTO;
+import com.karthick.expenz.expenses.dto.ExpenseListDTO;
 import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
 import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.entity.ExpenseGroup;
@@ -43,7 +44,7 @@ public class ExpenseService {
     }
   }
 
-  public List<ExpenseDTO> fetchThisMonthExpenses(long userId) {
+  public ExpenseListDTO fetchThisMonthExpenses(long userId) {
     LocalDate today = LocalDate.now();
     Specification<Expense> spec = buildSpecification(
       userId,
@@ -52,7 +53,7 @@ public class ExpenseService {
       null
     );
     try {
-      return getExpenseDTOs(expenseRepository.findAll(spec));
+      return toExpenseListDTO(expenseRepository.findAll(spec));
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());
     }
@@ -210,6 +211,32 @@ public class ExpenseService {
       expense.isIncome(),
       expense.getDateAdded(),
       expense.getExpenseGroupId()
+    );
+  }
+
+  private ExpenseListDTO toExpenseListDTO(List<Expense> expenses) {
+    List<ExpenseDTO> expenseDTOs = getExpenseDTOs(expenses);
+    long totalExpensesCount = 0;
+    long totalIncomeCount = 0;
+    double totalExpensesAmount = 0.0;
+    double totalIncomeAmount = 0.0;
+    for (ExpenseDTO expenseDTO : expenseDTOs) {
+      if (expenseDTO.isIncome()) {
+        totalIncomeCount++;
+        totalIncomeAmount += expenseDTO.getAmount();
+      } else {
+        totalExpensesCount++;
+        totalExpensesAmount += expenseDTO.getAmount();
+      }
+    }
+    double balanceAmount = totalIncomeAmount - totalExpensesAmount;
+    return new ExpenseListDTO(
+      totalExpensesCount,
+      totalIncomeCount,
+      totalExpensesAmount,
+      totalIncomeAmount,
+      balanceAmount,
+      expenseDTOs
     );
   }
 
