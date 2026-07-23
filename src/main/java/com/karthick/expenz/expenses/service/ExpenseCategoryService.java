@@ -17,8 +17,10 @@ public class ExpenseCategoryService {
   private final ExpenseSubCategoryRepository expenseSubCategoryRepository;
 
   public List<ExpenseCategoryDTO> getAllCategories() {
-    return expenseCategoryRepository.findAll().stream()
-      .map(c -> new ExpenseCategoryDTO(c.getId(), c.getName(), c.getDescription(), c.getIcon()))
+    return expenseCategoryRepository
+      .findAll()
+      .stream()
+      .map(c -> new ExpenseCategoryDTO(c.getId(), c.getName(), c.getIcon()))
       .toList();
   }
 
@@ -27,15 +29,27 @@ public class ExpenseCategoryService {
   ) {
     ExpenseCategory category = new ExpenseCategory();
     category.setName(categoryCreateDTO.getName());
-    category.setDescription(categoryCreateDTO.getDescription());
     category.setIcon(categoryCreateDTO.getIcon());
     category = expenseCategoryRepository.save(category);
-    return new ExpenseCategoryDTO(category.getId(), category.getName(), category.getDescription(), category.getIcon());
+    return new ExpenseCategoryDTO(
+      category.getId(),
+      category.getName(),
+      category.getIcon()
+    );
   }
 
   public List<ExpenseSubCategoryDTO> getAllSubCategories(Long categoryId) {
-    return expenseSubCategoryRepository.findByCategoryId(categoryId).stream()
-      .map(sc -> new ExpenseSubCategoryDTO(sc.getId(), sc.getName(), sc.getDescription(), sc.getIcon(), sc.getCategory().getId()))
+    return expenseSubCategoryRepository
+      .findByCategoryId(categoryId)
+      .stream()
+      .map(sc ->
+        new ExpenseSubCategoryDTO(
+          sc.getId(),
+          sc.getName(),
+          sc.getIcon(),
+          sc.getCategory().getId()
+        )
+      )
       .toList();
   }
 
@@ -44,7 +58,6 @@ public class ExpenseCategoryService {
   ) {
     ExpenseSubCategory subCategory = new ExpenseSubCategory();
     subCategory.setName(subCategoryCreateDTO.getName());
-    subCategory.setDescription(subCategoryCreateDTO.getDescription());
     subCategory.setIcon(subCategoryCreateDTO.getIcon());
     subCategory.setCategory(
       expenseCategoryRepository
@@ -52,6 +65,11 @@ public class ExpenseCategoryService {
         .orElseThrow()
     );
     subCategory = expenseSubCategoryRepository.save(subCategory);
-    return new ExpenseSubCategoryDTO(subCategory.getId(), subCategory.getName(), subCategory.getDescription(), subCategory.getIcon(), subCategory.getCategory().getId());
+    return new ExpenseSubCategoryDTO(
+      subCategory.getId(),
+      subCategory.getName(),
+      subCategory.getIcon(),
+      subCategory.getCategory().getId()
+    );
   }
 }

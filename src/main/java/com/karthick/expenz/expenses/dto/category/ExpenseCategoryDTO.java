@@ -10,6 +10,5 @@ public class ExpenseCategoryDTO {
 
   private Long id;
   private String name;
-  private String description;
   private String icon;
 }

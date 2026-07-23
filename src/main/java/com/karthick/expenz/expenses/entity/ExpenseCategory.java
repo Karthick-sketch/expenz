@@ -17,7 +17,6 @@ public class ExpenseCategory {
   private Long id;
 
   private String name;
-  private String description;
   private String icon;
 
   @OneToMany(

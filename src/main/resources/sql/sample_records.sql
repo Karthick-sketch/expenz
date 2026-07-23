@@ -51,7 +51,7 @@ INSERT INTO
         amount,
         title,
         description,
-        category,
+        category_id,
         is_income,
         date_added,
         user_id,
@@ -63,7 +63,13 @@ VALUES
         120.50,
         'Flight Ticket',
         'One-way ticket to NY',
-        'Travel',
+        (
+            SELECT id
+            FROM expense_sub_categories
+            WHERE
+                name = 'Flight'
+            LIMIT 1
+        ),
         false,
         '2026-07-01',
         (
@@ -84,7 +90,13 @@ VALUES
         45.00,
         'Uber Ride',
         'Ride to the hotel',
-        'Travel',
+        (
+            SELECT id
+            FROM expense_sub_categories
+            WHERE
+                name = 'Cab (Uber/Ola)'
+            LIMIT 1
+        ),
         false,
         '2026-07-02',
         (
@@ -105,7 +117,13 @@ VALUES
         350.00,
         'Hotel Stay',
         '3 nights at Downtown Hotel',
-        'Travel',
+        (
+            SELECT id
+            FROM expense_sub_categories
+            WHERE
+                name = 'Hotel'
+            LIMIT 1
+        ),
         false,
         '2026-07-03',
         (
@@ -126,7 +144,13 @@ VALUES
         25.00,
         'Subway Pass',
         'Weekly subway pass',
-        'Travel',
+        (
+            SELECT id
+            FROM expense_sub_categories
+            WHERE
+                name = 'Metro'
+            LIMIT 1
+        ),
         false,
         '2026-07-04',
         (
@@ -147,7 +171,13 @@ VALUES
         85.00,
         'Museum Tour',
         'Guided tour of Metropolitan Museum',
-        'Travel',
+        (
+            SELECT id
+            FROM expense_sub_categories
+            WHERE
+                name = 'Sightseeing'
+            LIMIT 1
+        ),
         false,
         '2026-07-05',
         (
@@ -170,7 +200,13 @@ VALUES
     64.20,
     'Weekly Groceries',
     'Milk, eggs, vegetables, and bread',
-    'Groceries',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Groceries'
+        LIMIT 1
+    ),
     false,
     '2026-07-02',
     (
@@ -191,7 +227,13 @@ VALUES
     18.50,
     'Coffee Beans',
     'Premium roasted coffee beans',
-    'Groceries',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Groceries'
+        LIMIT 1
+    ),
     false,
     '2026-07-04',
     (
@@ -212,7 +254,13 @@ VALUES
     42.10,
     'Snacks and Drinks',
     'Soda, chips, and cookies for party',
-    'Groceries',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Groceries'
+        LIMIT 1
+    ),
     false,
     '2026-07-06',
     (
@@ -233,7 +281,13 @@ VALUES
     12.80,
     'Fresh Fruits',
     'Apples, bananas, and strawberries',
-    'Groceries',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Groceries'
+        LIMIT 1
+    ),
     false,
     '2026-07-08',
     (
@@ -254,7 +308,13 @@ VALUES
     55.00,
     'Organic Vegetables',
     'Assorted organic greens',
-    'Groceries',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Groceries'
+        LIMIT 1
+    ),
     false,
     '2026-07-10',
     (
@@ -277,7 +337,13 @@ VALUES
     15.99,
     'Netflix Subscription',
     'Monthly premium plan',
-    'Entertainment',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'OTT Subscriptions'
+        LIMIT 1
+    ),
     false,
     '2026-07-01',
     (
@@ -298,7 +364,13 @@ VALUES
     60.00,
     'Concert Ticket',
     'Rock band live concert',
-    'Entertainment',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Concerts'
+        LIMIT 1
+    ),
     false,
     '2026-07-03',
     (
@@ -319,7 +391,13 @@ VALUES
     70.00,
     'Video Game',
     'Pre-ordered new RPG game',
-    'Entertainment',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Games'
+        LIMIT 1
+    ),
     false,
     '2026-07-05',
     (
@@ -340,7 +418,13 @@ VALUES
     30.00,
     'Cinema Tickets',
     'Tickets for 2 people with popcorn',
-    'Entertainment',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Movies'
+        LIMIT 1
+    ),
     false,
     '2026-07-08',
     (
@@ -361,7 +445,13 @@ VALUES
     9.99,
     'Spotify Premium',
     'Monthly music streaming subscription',
-    'Entertainment',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Music'
+        LIMIT 1
+    ),
     false,
     '2026-07-12',
     (
@@ -384,7 +474,13 @@ VALUES
     85.40,
     'Electricity Bill',
     'Power usage for June',
-    'Utilities',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Electricity'
+        LIMIT 1
+    ),
     false,
     '2026-07-05',
     (
@@ -405,7 +501,13 @@ VALUES
     30.00,
     'Water Bill',
     'Water usage for June',
-    'Utilities',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Water'
+        LIMIT 1
+    ),
     false,
     '2026-07-06',
     (
@@ -426,7 +528,13 @@ VALUES
     50.00,
     'Internet Service',
     'High-speed fiber connection',
-    'Utilities',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Internet'
+        LIMIT 1
+    ),
     false,
     '2026-07-10',
     (
@@ -447,7 +555,13 @@ VALUES
     15.00,
     'Gas Bill',
     'Gas utility charge',
-    'Utilities',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Gas'
+        LIMIT 1
+    ),
     false,
     '2026-07-12',
     (
@@ -468,7 +582,13 @@ VALUES
     45.00,
     'Mobile Phone Plan',
     'Unlimited talk and data plan',
-    'Utilities',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Mobile Recharge'
+        LIMIT 1
+    ),
     false,
     '2026-07-15',
     (
@@ -491,7 +611,13 @@ VALUES
     50.00,
     'Gym Membership',
     'Monthly gym pass',
-    'Fitness',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Gym Membership'
+        LIMIT 1
+    ),
     false,
     '2026-07-01',
     (
@@ -512,7 +638,13 @@ VALUES
     120.00,
     'Running Shoes',
     'Athletic training shoes',
-    'Fitness',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Equipment'
+        LIMIT 1
+    ),
     false,
     '2026-07-04',
     (
@@ -533,7 +665,13 @@ VALUES
     35.00,
     'Whey Protein',
     '1kg chocolate protein powder',
-    'Fitness',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Supplements'
+        LIMIT 1
+    ),
     false,
     '2026-07-08',
     (
@@ -554,7 +692,13 @@ VALUES
     15.00,
     'Yoga Mat',
     'Non-slip yoga mat',
-    'Fitness',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Yoga'
+        LIMIT 1
+    ),
     false,
     '2026-07-11',
     (
@@ -575,7 +719,13 @@ VALUES
     28.00,
     'Resistance Bands',
     'Set of 5 resistance bands',
-    'Fitness',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Equipment'
+        LIMIT 1
+    ),
     false,
     '2026-07-14',
     (
@@ -598,7 +748,7 @@ VALUES
     2500.00,
     'Monthly Salary',
     'Direct deposit from employer',
-    'Salary',
+    NULL,
     true,
     '2026-07-01',
     (
@@ -613,7 +763,13 @@ VALUES
     45.00,
     'Haircut',
     'Haircut and styling',
-    'Personal Care',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Salon'
+        LIMIT 1
+    ),
     false,
     '2026-07-07',
     (
@@ -628,7 +784,13 @@ VALUES
     12.50,
     'Lunch Out',
     'Fast food lunch',
-    'Food',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Dining Out'
+        LIMIT 1
+    ),
     false,
     '2026-07-09',
     (
@@ -643,7 +805,13 @@ VALUES
     150.00,
     'Birthday Gift',
     'Gift for friend',
-    'Gifts',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Gifts'
+        LIMIT 1
+    ),
     false,
     '2026-07-12',
     (
@@ -658,7 +826,13 @@ VALUES
     20.00,
     'Book Purchase',
     'Fiction novel',
-    'Books',
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Books'
+        LIMIT 1
+    ),
     false,
     '2026-07-16',
     (

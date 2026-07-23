@@ -9,6 +9,5 @@ import lombok.*;
 public class ExpenseCategoryCreateDTO {
 
   private String name;
-  private String description;
   private String icon;
 }

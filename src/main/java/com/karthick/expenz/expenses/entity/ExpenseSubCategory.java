@@ -16,7 +16,6 @@ public class ExpenseSubCategory {
   private Long id;
 
   private String name;
-  private String description;
   private String icon;
 
   @ManyToOne(optional = false)
