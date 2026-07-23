@@ -270,11 +270,11 @@ public class ExpenseService {
   }
 
   private ExpenseGroupListDTO toExpenseGroupListDTO(ExpenseGroup expenseGroup) {
-    Long expenseCount = expenseRepository.countByIncomeAndUserId(
+    Long expenseCount = expenseRepository.countTotalExpensesInGroup(
       false,
       expenseGroup.getId()
     );
-    Long incomeCount = expenseRepository.countByIncomeAndUserId(
+    Long incomeCount = expenseRepository.countTotalExpensesInGroup(
       true,
       expenseGroup.getId()
     );

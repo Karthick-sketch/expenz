@@ -20,6 +20,15 @@ public interface ExpenseRepository
   /* Dashboard */
   Long countByIncomeAndUserId(boolean income, Long userId);
 
+  /* Expense Group */
+  @Query(
+    "SELECT COUNT(e) FROM Expense e WHERE e.income = :income AND e.expenseGroup.id = :expenseGroupId"
+  )
+  Long countTotalExpensesInGroup(
+    @Param("income") boolean income,
+    @Param("expenseGroupId") Long expenseGroupId
+  );
+
   @Query(
     "SELECT COALESCE(SUM(e.amount), 0.0) FROM Expense e WHERE e.user.id = :userId AND e.income = :income"
   )
