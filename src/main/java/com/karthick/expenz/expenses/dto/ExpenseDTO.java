@@ -16,7 +16,8 @@ public class ExpenseDTO {
   private double amount;
   private String title;
   private String description;
-  private String category;
+  private Long categoryId;
+  private Long subCategoryId;
   private boolean income;
   private LocalDate dateAdded;
   private Long expenseGroupId;

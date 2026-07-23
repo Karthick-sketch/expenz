@@ -18,6 +18,7 @@ public class ExpenseCategory {
 
   private String name;
   private String icon;
+  private String colorHex;
 
   @OneToMany(
     mappedBy = "category",

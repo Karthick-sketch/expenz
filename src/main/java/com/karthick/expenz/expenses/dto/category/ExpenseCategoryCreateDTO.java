@@ -10,4 +10,5 @@ public class ExpenseCategoryCreateDTO {
 
   private String name;
   private String icon;
+  private String colorHex;
 }

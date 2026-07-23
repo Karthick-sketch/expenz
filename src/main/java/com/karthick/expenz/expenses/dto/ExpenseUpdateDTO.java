@@ -6,7 +6,8 @@ public record ExpenseUpdateDTO(
   double amount,
   String title,
   String description,
-  String category,
+  Long categoryId,
+  Long subCategoryId,
   boolean income,
   LocalDate dateAdded,
   Long expenseGroupId

@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS expense_categories (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255),
-    icon VARCHAR(255)
+    icon VARCHAR(255),
+    color_hex CHAR(7)
 );
 
 CREATE TABLE IF NOT EXISTS expense_sub_categories (
@@ -34,42 +35,88 @@ CREATE TABLE IF NOT EXISTS expenses (
     amount DOUBLE PRECISION NOT NULL,
     title VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    category_id BIGINT,
+    sub_category_id BIGINT,
     is_income BOOLEAN NOT NULL,
     date_added DATE NOT NULL,
     user_id BIGINT NOT NULL,
     expense_group_id BIGINT,
-    CONSTRAINT fk_expense_category FOREIGN KEY (category_id) REFERENCES expense_sub_categories (id),
+    CONSTRAINT fk_expense_sub_category FOREIGN KEY (sub_category_id) REFERENCES expense_sub_categories (id),
     CONSTRAINT fk_expense_user FOREIGN KEY (user_id) REFERENCES users (id),
     CONSTRAINT fk_expense_group FOREIGN KEY (expense_group_id) REFERENCES expense_groups (id)
 );
 
 -- Categories
 INSERT INTO
-    expense_categories (name, icon)
-VALUES ('Housing', 'home'),
-    ('Vehicle', 'car'),
-    ('Transportation', 'bus'),
-    ('Food & Drinks', 'utensils'),
-    ('Utilities', 'plug'),
-    ('Shopping', 'shopping-bag'),
-    ('Entertainment', 'film'),
+    expense_categories (name, icon, color_hex)
+VALUES ('Housing', 'home', '#8B5E3C'),
+    ('Vehicle', 'car', '#4A90D9'),
+    (
+        'Transportation',
+        'bus',
+        '#50C878'
+    ),
+    (
+        'Food & Drinks',
+        'utensils',
+        '#E67E22'
+    ),
+    (
+        'Utilities',
+        'plug',
+        '#F1C40F'
+    ),
+    (
+        'Shopping',
+        'shopping-bag',
+        '#E91E63'
+    ),
+    (
+        'Entertainment',
+        'film',
+        '#9B59B6'
+    ),
     (
         'Health & Wellness',
-        'heart-pulse'
+        'heart-pulse',
+        '#E74C3C'
     ),
-    ('Fitness', 'dumbbell'),
-    ('Communication', 'phone'),
-    ('Education', 'graduation-cap'),
-    ('Pets', 'paw-print'),
-    ('Travel', 'plane'),
-    ('Income', 'wallet'),
-    ('Investments', 'trending-up'),
-    ('Bills & Finance', 'receipt'),
-    ('Personal', 'user');
+    (
+        'Fitness',
+        'dumbbell',
+        '#16A085'
+    ),
+    (
+        'Communication',
+        'phone',
+        '#3498DB'
+    ),
+    (
+        'Education',
+        'graduation-cap',
+        '#2C3E50'
+    ),
+    (
+        'Pets',
+        'paw-print',
+        '#D35400'
+    ),
+    ('Travel', 'plane', '#1ABC9C'),
+    ('Income', 'wallet', '#27AE60'),
+    (
+        'Investments',
+        'trending-up',
+        '#F39C12'
+    ),
+    (
+        'Bills & Finance',
+        'receipt',
+        '#7F8C8D'
+    ),
+    ('Personal', 'user', '#C0392B'),
+    ('Other', 'other', '#95A5A6');
 
 -- Keep BIGSERIAL in sync
-SELECT setval( 'expense_categories_id_seq', 17, true );
+SELECT setval( 'expense_categories_id_seq', 18, true );
 
 -- Subcategories
 -- NOTE: column order corrected to (category_id, name, icon) to match the values below
@@ -480,7 +527,10 @@ INSERT INTO expense_sub_categories (name, icon, category_id) VALUES
     'Other Personal',
     'more-horizontal',
     17
-);
+),
+
+-- Other
+('Other', 'other', 18);
 
 -- Keep BIGSERIAL in sync
 SELECT setval(

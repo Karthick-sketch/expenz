@@ -91,8 +91,8 @@ public class ExpenseService {
     expense.setTitle(updatedExpense.title());
     expense.setDescription(updatedExpense.description());
     expenseSubCategoryRepository
-      .findByName(updatedExpense.category())
-      .ifPresent(expense::setCategory);
+      .findById(updatedExpense.subCategoryId())
+      .ifPresent(expense::setSubCategory);
     expense.setIncome(updatedExpense.income());
     expense.setDateAdded(updatedExpense.dateAdded());
     try {
@@ -189,8 +189,8 @@ public class ExpenseService {
     expense.setTitle(expenseDTO.getTitle());
     expense.setDescription(expenseDTO.getDescription());
     expenseSubCategoryRepository
-      .findByName(expenseDTO.getCategory())
-      .ifPresent(expense::setCategory);
+      .findById(expenseDTO.getSubCategoryId())
+      .ifPresent(expense::setSubCategory);
     expense.setIncome(expenseDTO.isIncome());
     expense.setDateAdded(expenseDTO.getDateAdded());
     if (expenseDTO.getExpenseGroupId() != null) {
@@ -207,7 +207,8 @@ public class ExpenseService {
       expense.getAmount(),
       expense.getTitle(),
       expense.getDescription(),
-      expense.getCategory() != null ? expense.getCategory().getName() : null,
+      expense.getCategoryId(),
+      expense.getSubCategory().getId(),
       expense.isIncome(),
       expense.getDateAdded(),
       expense.getExpenseGroupId()

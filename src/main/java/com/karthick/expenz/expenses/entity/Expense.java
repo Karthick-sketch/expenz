@@ -27,8 +27,8 @@ public class Expense implements Serializable {
   private String description;
 
   @ManyToOne
-  @JoinColumn(name = "category_id", referencedColumnName = "id")
-  private ExpenseSubCategory category;
+  @JoinColumn(name = "sub_category_id", referencedColumnName = "id")
+  private ExpenseSubCategory subCategory;
 
   @Column(name = "is_income", nullable = false)
   private boolean income;
@@ -43,6 +43,10 @@ public class Expense implements Serializable {
   @ManyToOne
   @JoinColumn(name = "expense_group_id", referencedColumnName = "id")
   private ExpenseGroup expenseGroup;
+
+  public Long getCategoryId() {
+    return this.subCategory.getCategory().getId();
+  }
 
   public Long getExpenseGroupId() {
     return this.expenseGroup != null ? this.expenseGroup.getId() : null;

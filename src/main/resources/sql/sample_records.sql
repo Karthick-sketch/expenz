@@ -51,7 +51,7 @@ INSERT INTO
         amount,
         title,
         description,
-        category_id,
+        sub_category_id,
         is_income,
         date_added,
         user_id,
@@ -748,7 +748,13 @@ VALUES
     2500.00,
     'Monthly Salary',
     'Direct deposit from employer',
-    NULL,
+    (
+        SELECT id
+        FROM expense_sub_categories
+        WHERE
+            name = 'Salary'
+        LIMIT 1
+    ),
     true,
     '2026-07-01',
     (

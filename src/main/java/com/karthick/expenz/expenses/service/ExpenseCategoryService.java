@@ -1,5 +1,6 @@
 package com.karthick.expenz.expenses.service;
 
+import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.expenses.dto.category.*;
 import com.karthick.expenz.expenses.entity.ExpenseCategory;
 import com.karthick.expenz.expenses.entity.ExpenseSubCategory;
@@ -20,8 +21,16 @@ public class ExpenseCategoryService {
     return expenseCategoryRepository
       .findAll()
       .stream()
-      .map(c -> new ExpenseCategoryDTO(c.getId(), c.getName(), c.getIcon()))
+      .map(this::toExpenseCategoryDTO)
       .toList();
+  }
+
+  public ExpenseCategory getCategory(Long id) {
+    return expenseCategoryRepository
+      .findById(id)
+      .orElseThrow(() ->
+        new EntityNotFoundException(id, ExpenseCategory.class)
+      );
   }
 
   public ExpenseCategoryDTO createCategory(
@@ -31,26 +40,23 @@ public class ExpenseCategoryService {
     category.setName(categoryCreateDTO.getName());
     category.setIcon(categoryCreateDTO.getIcon());
     category = expenseCategoryRepository.save(category);
-    return new ExpenseCategoryDTO(
-      category.getId(),
-      category.getName(),
-      category.getIcon()
-    );
+    return toExpenseCategoryDTO(category);
   }
 
   public List<ExpenseSubCategoryDTO> getAllSubCategories(Long categoryId) {
     return expenseSubCategoryRepository
       .findByCategoryId(categoryId)
       .stream()
-      .map(sc ->
-        new ExpenseSubCategoryDTO(
-          sc.getId(),
-          sc.getName(),
-          sc.getIcon(),
-          sc.getCategory().getId()
-        )
-      )
+      .map(this::toExpenseSubCategoryDTO)
       .toList();
+  }
+
+  public ExpenseSubCategory getSubCategory(Long id) {
+    return expenseSubCategoryRepository
+      .findById(id)
+      .orElseThrow(() ->
+        new EntityNotFoundException(id, ExpenseSubCategory.class)
+      );
   }
 
   public ExpenseSubCategoryDTO createSubCategory(
@@ -59,12 +65,23 @@ public class ExpenseCategoryService {
     ExpenseSubCategory subCategory = new ExpenseSubCategory();
     subCategory.setName(subCategoryCreateDTO.getName());
     subCategory.setIcon(subCategoryCreateDTO.getIcon());
-    subCategory.setCategory(
-      expenseCategoryRepository
-        .findById(subCategoryCreateDTO.getCategoryId())
-        .orElseThrow()
-    );
+    subCategory.setCategory(getCategory(subCategoryCreateDTO.getCategoryId()));
     subCategory = expenseSubCategoryRepository.save(subCategory);
+    return toExpenseSubCategoryDTO(subCategory);
+  }
+
+  private ExpenseCategoryDTO toExpenseCategoryDTO(ExpenseCategory category) {
+    return new ExpenseCategoryDTO(
+      category.getId(),
+      category.getName(),
+      category.getIcon(),
+      category.getColorHex()
+    );
+  }
+
+  private ExpenseSubCategoryDTO toExpenseSubCategoryDTO(
+    ExpenseSubCategory subCategory
+  ) {
     return new ExpenseSubCategoryDTO(
       subCategory.getId(),
       subCategory.getName(),

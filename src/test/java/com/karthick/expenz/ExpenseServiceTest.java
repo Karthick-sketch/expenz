@@ -65,7 +65,7 @@ public class ExpenseServiceTest {
     expense.setAmount(50_000.0);
     ExpenseSubCategory category = new ExpenseSubCategory();
     category.setName("electronics");
-    expense.setCategory(category);
+    expense.setSubCategory(category);
     expense.setIncome(false);
     expense.setTitle("Playstation 5");
     expense.setDescription("Play next generation games");
@@ -86,7 +86,8 @@ public class ExpenseServiceTest {
   private ExpenseDTO getTestExpenseDTOData() {
     ExpenseDTO dto = new ExpenseDTO();
     dto.setAmount(50_000.0);
-    dto.setCategory("electronics");
+    dto.setCategoryId(1L);
+    dto.setSubCategoryId(1L);
     dto.setIncome(false);
     dto.setTitle("Playstation 5");
     dto.setDescription("Play next generation games");
@@ -100,7 +101,7 @@ public class ExpenseServiceTest {
     assertEquals(expense.getAmount(), dto.getAmount(), 0.001);
     assertEquals(expense.getTitle(), dto.getTitle());
     assertEquals(expense.getDescription(), dto.getDescription());
-    assertEquals(expense.getCategory() != null ? expense.getCategory().getName() : null, dto.getCategory());
+    assertEquals(expense.getSubCategory(), dto.getSubCategoryId());
     assertEquals(expense.isIncome(), dto.isIncome());
     assertEquals(expense.getDateAdded(), dto.getDateAdded());
   }
@@ -231,9 +232,9 @@ public class ExpenseServiceTest {
     when(expenseGroupRepository.findById(1L)).thenReturn(
       Optional.of(mockExpense.getExpenseGroup())
     );
-    when(expenseSubCategoryRepository.findByName(mockExpenseDTO.getCategory())).thenReturn(
-      Optional.of(mockExpense.getCategory())
-    );
+    when(
+      expenseSubCategoryRepository.findById(mockExpenseDTO.getSubCategoryId())
+    ).thenReturn(Optional.of(mockExpense.getSubCategory()));
 
     ExpenseDTO expense = expenseService.createExpense(
       mockExpenseDTO,
@@ -254,15 +255,16 @@ public class ExpenseServiceTest {
       )
     ).thenReturn(Optional.of(mockExpense));
     when(expenseRepository.save(mockExpense)).thenReturn(mockExpense);
-    when(expenseSubCategoryRepository.findByName(any())).thenReturn(
-      Optional.of(mockExpense.getCategory())
+    when(expenseSubCategoryRepository.findById(any())).thenReturn(
+      Optional.of(mockExpense.getSubCategory())
     );
 
     ExpenseUpdateDTO updatedFields = new ExpenseUpdateDTO(
       45_000.0,
       mockExpense.getTitle(),
       mockExpense.getDescription(),
-      mockExpense.getCategory().getName(),
+      mockExpense.getCategoryId(),
+      mockExpense.getSubCategory().getId(),
       mockExpense.isIncome(),
       mockExpense.getDateAdded(),
       mockExpense.getExpenseGroup().getId()
