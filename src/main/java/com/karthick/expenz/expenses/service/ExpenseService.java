@@ -1,21 +1,18 @@
 package com.karthick.expenz.expenses.service;
 
+import com.karthick.expenz.enums.ExpenseDuration;
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
-import com.karthick.expenz.expenses.dto.DashboardDTO;
-import com.karthick.expenz.expenses.dto.ExpenseDTO;
-import com.karthick.expenz.expenses.dto.ExpenseGroupCreateDTO;
-import com.karthick.expenz.expenses.dto.ExpenseGroupDTO;
-import com.karthick.expenz.expenses.dto.ExpenseGroupListDTO;
-import com.karthick.expenz.expenses.dto.ExpenseListDTO;
-import com.karthick.expenz.expenses.dto.ExpenseUpdateDTO;
+import com.karthick.expenz.expenses.dto.*;
 import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.entity.ExpenseGroup;
 import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
 import com.karthick.expenz.expenses.repository.ExpenseSubCategoryRepository;
 import com.karthick.expenz.expenses.specification.ExpenseSpecification;
+import com.karthick.expenz.filter.ExpenseFilter;
 import com.karthick.expenz.users.service.UserService;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -44,29 +41,13 @@ public class ExpenseService {
     }
   }
 
-  public ExpenseListDTO fetchThisMonthExpenses(long userId) {
-    LocalDate today = LocalDate.now();
-    Specification<Expense> spec = buildSpecification(
-      userId,
-      today.getMonthValue(),
-      today.getYear(),
-      null
-    );
+  public ExpenseListDTO fetchExpenses(ExpenseFilter filter, long userId) {
     try {
+      Specification<Expense> spec = buildSpecification(filter, userId);
       return toExpenseListDTO(expenseRepository.findAll(spec));
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());
     }
-  }
-
-  public List<ExpenseDTO> fetchExpenses(
-    Integer month,
-    Integer year,
-    Boolean type,
-    long userId
-  ) {
-    Specification<Expense> spec = buildSpecification(userId, month, year, type);
-    return getExpenseDTOs(expenseRepository.findAll(spec));
   }
 
   public Expense findExpense(long id, long userId) {
@@ -162,18 +143,66 @@ public class ExpenseService {
   }
 
   private Specification<Expense> buildSpecification(
-    long userId,
-    Integer month,
-    Integer year,
-    Boolean type
+    ExpenseFilter filter,
+    long userId
   ) {
+    calculateDateRange(filter);
     Specification<Expense> spec = (root, query, criteriaBuilder) ->
       criteriaBuilder.conjunction();
     return spec
       .and(ExpenseSpecification.withUserId(userId))
-      .and(ExpenseSpecification.withMonth(month))
-      .and(ExpenseSpecification.withYear(year))
-      .and(ExpenseSpecification.withExpenseType(type));
+      .and(ExpenseSpecification.withExpenseType(filter.getType()))
+      .and(ExpenseSpecification.withFromDate(filter.getFromDate()))
+      .and(ExpenseSpecification.withToDate(filter.getToDate()))
+      .and(ExpenseSpecification.withSubCategory(filter.getSubCategoryId()))
+      .and(ExpenseSpecification.withSearchTerm(filter.getSearchTerm()));
+  }
+
+  private void calculateDateRange(ExpenseFilter filter) {
+    if (filter.getDuration() == null) {
+      filter.setDuration(ExpenseDuration.ALL_TIME);
+    }
+
+    LocalDate fromDate = filter.getFromDate();
+    LocalDate toDate = filter.getToDate();
+    switch (filter.getDuration()) {
+      case ALL_TIME:
+        fromDate = null;
+        toDate = null;
+        break;
+      case THIS_WEEK:
+        fromDate = LocalDate.now().with(DayOfWeek.MONDAY);
+        toDate = LocalDate.now().with(DayOfWeek.SUNDAY);
+        break;
+      case LAST_WEEK:
+        fromDate = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
+        toDate = LocalDate.now().with(DayOfWeek.SUNDAY);
+        break;
+      case THIS_MONTH:
+        fromDate = LocalDate.now().withDayOfMonth(1);
+        toDate = LocalDate.now().withDayOfMonth(
+          LocalDate.now().lengthOfMonth()
+        );
+        break;
+      case LAST_MONTH:
+        fromDate = LocalDate.now().minusMonths(1).withDayOfMonth(1);
+        toDate = LocalDate.now().withDayOfMonth(
+          LocalDate.now().lengthOfMonth()
+        );
+        break;
+      case THIS_YEAR:
+        fromDate = LocalDate.now().withDayOfYear(1);
+        toDate = LocalDate.now().withDayOfYear(LocalDate.now().lengthOfYear());
+        break;
+      case LAST_YEAR:
+        fromDate = LocalDate.now().minusYears(1).withDayOfYear(1);
+        toDate = LocalDate.now().withDayOfYear(LocalDate.now().lengthOfYear());
+        break;
+      case DATE_RANGE:
+        break;
+    }
+    filter.setFromDate(fromDate);
+    filter.setToDate(toDate);
   }
 
   private List<ExpenseDTO> getExpenseDTOs(List<Expense> expenses) {

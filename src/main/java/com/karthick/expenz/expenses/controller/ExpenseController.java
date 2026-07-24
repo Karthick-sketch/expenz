@@ -4,6 +4,7 @@ import com.karthick.expenz.auth.UserSession;
 import com.karthick.expenz.expenses.dto.*;
 import com.karthick.expenz.expenses.dto.category.*;
 import com.karthick.expenz.expenses.service.*;
+import com.karthick.expenz.filter.ExpenseFilter;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,22 +35,12 @@ public class ExpenseController {
     );
   }
 
-  @GetMapping
-  public ResponseEntity<List<ExpenseDTO>> getExpenses(
-    @RequestParam(required = false) Integer month,
-    @RequestParam(required = false) Integer year,
-    @RequestParam(required = false) Boolean type
+  @PostMapping("/query")
+  public ResponseEntity<ExpenseListDTO> queryExpenses(
+    @RequestBody ExpenseFilter filter
   ) {
     return new ResponseEntity<>(
-      expenseService.fetchExpenses(month, year, type, userId()),
-      HttpStatus.OK
-    );
-  }
-
-  @GetMapping("/this-month")
-  public ResponseEntity<ExpenseListDTO> getThisMonthExpenses() {
-    return new ResponseEntity<>(
-      expenseService.fetchThisMonthExpenses(userId()),
+      expenseService.fetchExpenses(filter, userId()),
       HttpStatus.OK
     );
   }
