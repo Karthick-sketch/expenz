@@ -36,8 +36,17 @@ public class ExpenseSpecification {
       cb.lessThanOrEqualTo(root.get("dateAdded"), toDate);
   }
 
+  public static Specification<Expense> withCategory(Long categoryId) {
+    if (categoryId == null || categoryId <= 0) {
+      return (root, query, cb) -> cb.conjunction();
+    }
+
+    return (root, query, cb) ->
+      cb.equal(root.get("subCategory").get("category").get("id"), categoryId);
+  }
+
   public static Specification<Expense> withSubCategory(Long subCategoryId) {
-    if (subCategoryId == null) {
+    if (subCategoryId == null || subCategoryId <= 0) {
       return (root, query, cb) -> cb.conjunction();
     }
     return (root, query, cb) ->

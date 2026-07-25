@@ -154,6 +154,7 @@ public class ExpenseService {
       .and(ExpenseSpecification.withExpenseType(filter.getType()))
       .and(ExpenseSpecification.withFromDate(filter.getFromDate()))
       .and(ExpenseSpecification.withToDate(filter.getToDate()))
+      .and(ExpenseSpecification.withCategory(filter.getCategoryId()))
       .and(ExpenseSpecification.withSubCategory(filter.getSubCategoryId()))
       .and(ExpenseSpecification.withSearchTerm(filter.getSearchTerm()));
   }

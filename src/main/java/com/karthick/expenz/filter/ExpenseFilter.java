@@ -15,6 +15,7 @@ import lombok.Setter;
 public class ExpenseFilter {
 
   private ExpenseType type;
+  private Long categoryId;
   private Long subCategoryId;
   private ExpenseDuration duration;
   private LocalDate fromDate;
