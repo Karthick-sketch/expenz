@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +46,11 @@ public class ExpenseService {
   public ExpenseListDTO fetchExpenses(ExpenseFilter filter, long userId) {
     try {
       Specification<Expense> spec = buildSpecification(filter, userId);
-      return toExpenseListDTO(expenseRepository.findAll(spec));
+      Page<Expense> page = expenseRepository.findAll(
+        spec,
+        PageRequest.of(filter.getPage(), filter.getSize())
+      );
+      return toExpenseListDTO(page.toList());
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());
     }
