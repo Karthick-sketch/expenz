@@ -43,14 +43,22 @@ public class ExpenseService {
     }
   }
 
-  public ExpenseListDTO fetchExpenses(ExpenseFilter filter, long userId) {
+  public Page<ExpenseDTO> fetchExpenses(ExpenseFilter filter, long userId) {
     try {
       Specification<Expense> spec = buildSpecification(filter, userId);
-      Page<Expense> page = expenseRepository.findAll(
-        spec,
-        PageRequest.of(filter.getPage(), filter.getSize())
-      );
-      return toExpenseListDTO(page.toList());
+      Page<ExpenseDTO> page = expenseRepository
+        .findAll(spec, PageRequest.of(filter.getPage(), filter.getSize()))
+        .map(this::toExpenseDTO);
+      return page;
+    } catch (Exception ex) {
+      throw new BadRequestException(ex.getMessage());
+    }
+  }
+
+  public ExpenseSummaryDTO fetchSummary(ExpenseFilter filter, long userId) {
+    try {
+      Specification<Expense> spec = buildSpecification(filter, userId);
+      return toExpenseSummaryDTO(expenseRepository.findAll(spec));
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());
     }
@@ -251,29 +259,27 @@ public class ExpenseService {
     );
   }
 
-  private ExpenseListDTO toExpenseListDTO(List<Expense> expenses) {
-    List<ExpenseDTO> expenseDTOs = getExpenseDTOs(expenses);
+  private ExpenseSummaryDTO toExpenseSummaryDTO(List<Expense> expenses) {
     long totalExpensesCount = 0;
     long totalIncomeCount = 0;
     double totalExpensesAmount = 0.0;
     double totalIncomeAmount = 0.0;
-    for (ExpenseDTO expenseDTO : expenseDTOs) {
-      if (expenseDTO.isIncome()) {
+    for (Expense expense : expenses) {
+      if (expense.isIncome()) {
         totalIncomeCount++;
-        totalIncomeAmount += expenseDTO.getAmount();
+        totalIncomeAmount += expense.getAmount();
       } else {
         totalExpensesCount++;
-        totalExpensesAmount += expenseDTO.getAmount();
+        totalExpensesAmount += expense.getAmount();
       }
     }
     double balanceAmount = totalIncomeAmount - totalExpensesAmount;
-    return new ExpenseListDTO(
+    return new ExpenseSummaryDTO(
       totalExpensesCount,
       totalIncomeCount,
       totalExpensesAmount,
       totalIncomeAmount,
-      balanceAmount,
-      expenseDTOs
+      balanceAmount
     );
   }
 

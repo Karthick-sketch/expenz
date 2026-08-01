@@ -7,6 +7,7 @@ import com.karthick.expenz.expenses.service.*;
 import com.karthick.expenz.filter.ExpenseFilter;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,27 @@ public class ExpenseController {
     return userSession.getAuthenticatedUserId();
   }
 
+  // QUERY Methods
+  @PostMapping("/query")
+  public ResponseEntity<Page<ExpenseDTO>> queryExpenses(
+    @RequestBody ExpenseFilter filter
+  ) {
+    return new ResponseEntity<>(
+      expenseService.fetchExpenses(filter, userId()),
+      HttpStatus.OK
+    );
+  }
+
+  @PostMapping("/query/summary")
+  public ResponseEntity<ExpenseSummaryDTO> querySummary(
+    @RequestBody ExpenseFilter filter
+  ) {
+    return new ResponseEntity<>(
+      expenseService.fetchSummary(filter, userId()),
+      HttpStatus.OK
+    );
+  }
+
   @PostMapping
   public ResponseEntity<ExpenseDTO> createNewExpense(
     @RequestBody ExpenseDTO expenseDTO
@@ -32,16 +54,6 @@ public class ExpenseController {
     return new ResponseEntity<>(
       expenseService.createExpense(expenseDTO, userId()),
       HttpStatus.CREATED
-    );
-  }
-
-  @PostMapping("/query")
-  public ResponseEntity<ExpenseListDTO> queryExpenses(
-    @RequestBody ExpenseFilter filter
-  ) {
-    return new ResponseEntity<>(
-      expenseService.fetchExpenses(filter, userId()),
-      HttpStatus.OK
     );
   }
 
