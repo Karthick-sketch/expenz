@@ -15,7 +15,6 @@ import com.karthick.expenz.filter.ExpenseFilter;
 import com.karthick.expenz.users.service.UserService;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -66,11 +65,9 @@ public class ExpenseService {
   }
 
   public Expense findExpense(long id, long userId) {
-    Optional<Expense> expense = expenseRepository.findByIdAndUserId(id, userId);
-    if (expense.isEmpty()) {
-      throw new EntityNotFoundException(id, Expense.class);
-    }
-    return expense.get();
+    return expenseRepository
+      .findByIdAndUserId(id, userId)
+      .orElseThrow(() -> new EntityNotFoundException(id, Expense.class));
   }
 
   public ExpenseDTO findExpenseDTO(long id, long userId) {

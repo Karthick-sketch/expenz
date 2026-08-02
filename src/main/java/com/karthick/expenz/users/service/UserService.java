@@ -2,12 +2,9 @@ package com.karthick.expenz.users.service;
 
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
-import com.karthick.expenz.users.dto.UserCreateDTO;
-import com.karthick.expenz.users.dto.UserDTO;
-import com.karthick.expenz.users.dto.UserUpdateDTO;
+import com.karthick.expenz.users.dto.*;
 import com.karthick.expenz.users.entity.User;
 import com.karthick.expenz.users.repository.UserRepository;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,11 +17,9 @@ public class UserService {
   private PasswordEncoder passwordEncoder;
 
   public User findUser(long id) {
-    Optional<User> user = userRepository.findById(id);
-    if (user.isPresent()) {
-      return user.get();
-    }
-    throw new EntityNotFoundException(id, User.class);
+    return userRepository
+      .findById(id)
+      .orElseThrow(() -> new EntityNotFoundException(id, User.class));
   }
 
   public UserDTO findUserDTO(long id) {
@@ -32,13 +27,9 @@ public class UserService {
   }
 
   public User findUserByEmail(String email) {
-    Optional<User> user = userRepository.findByEmailIgnoreCase(email);
-    if (user.isPresent()) {
-      return user.get();
-    }
-    throw new EntityNotFoundException(
-      "The user with the email '" + email + "' does not exist in our records"
-    );
+    return userRepository
+      .findByEmailIgnoreCase(email)
+      .orElseThrow(() -> new EntityNotFoundException("Invalid email address"));
   }
 
   public UserDTO findUserDTOByEmail(String email) {
