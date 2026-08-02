@@ -18,4 +18,6 @@ public class DashboardDTO {
   private Long totalExpenseCount;
   private Long totalIncomeCount;
   private List<ExpenseDTO> recentExpenses;
+  private List<PieDataItem> expensePieDataItems;
+  private List<PieDataItem> incomePieDataItems;
 }

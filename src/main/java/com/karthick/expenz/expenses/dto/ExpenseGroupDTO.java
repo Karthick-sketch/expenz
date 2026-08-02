@@ -11,5 +11,7 @@ public record ExpenseGroupDTO(
   double totalExpensesAmount,
   double totalIncomesAmount,
   double balanceAmount,
-  List<ExpenseDTO> expenses
+  List<ExpenseDTO> expenses,
+  List<PieDataItem> expensePieDataItems,
+  List<PieDataItem> incomePieDataItems
 ) {}

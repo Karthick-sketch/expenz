@@ -1,19 +1,18 @@
 package com.karthick.expenz.expenses.service;
 
-import com.karthick.expenz.enums.ExpenseDuration;
+import static com.karthick.expenz.expenses.util.ExpenseUtils.*;
+
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.expenses.dto.*;
+import com.karthick.expenz.expenses.dto.category.ExpenseCategoryDTO;
 import com.karthick.expenz.expenses.entity.Expense;
 import com.karthick.expenz.expenses.entity.ExpenseGroup;
 import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
-import com.karthick.expenz.expenses.repository.ExpenseSubCategoryRepository;
 import com.karthick.expenz.expenses.specification.ExpenseSpecification;
 import com.karthick.expenz.filter.ExpenseFilter;
 import com.karthick.expenz.users.service.UserService;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -29,9 +28,9 @@ public class ExpenseService {
 
   private ExpenseRepository expenseRepository;
   private ExpenseGroupRepository expenseGroupRepository;
-  private ExpenseSubCategoryRepository expenseSubCategoryRepository;
 
   private UserService userService;
+  private ExpenseCategoryService expenseCategoryService;
 
   public ExpenseDTO createExpense(ExpenseDTO expenseDTO, long userId) {
     try {
@@ -58,7 +57,9 @@ public class ExpenseService {
   public ExpenseSummaryDTO fetchSummary(ExpenseFilter filter, long userId) {
     try {
       Specification<Expense> spec = buildSpecification(filter, userId);
-      return toExpenseSummaryDTO(expenseRepository.findAll(spec));
+      return toExpenseSummaryDTO(
+        getExpenseDTOs(expenseRepository.findAll(spec))
+      );
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());
     }
@@ -85,9 +86,7 @@ public class ExpenseService {
     expense.setAmount(updatedExpense.amount());
     expense.setTitle(updatedExpense.title());
     expense.setDescription(updatedExpense.description());
-    expenseSubCategoryRepository
-      .findById(updatedExpense.subCategoryId())
-      .ifPresent(expense::setSubCategory);
+    expenseCategoryService.getSubCategory(updatedExpense.subCategoryId());
     expense.setIncome(updatedExpense.income());
     expense.setDateAdded(updatedExpense.dateAdded());
     try {
@@ -113,7 +112,11 @@ public class ExpenseService {
       true,
       userId
     );
-    List<Expense> recentExpenses = expenseRepository.getRecentExpenses(userId);
+    List<ExpenseDTO> recentExpenses = getExpenseDTOs(
+      expenseRepository.getRecentExpenses(userId)
+    );
+    List<ExpenseCategoryDTO> categories =
+      expenseCategoryService.getAllCategories();
 
     DashboardDTO dashboardDTO = new DashboardDTO();
     dashboardDTO.setBalance(balance);
@@ -121,7 +124,13 @@ public class ExpenseService {
     dashboardDTO.setTotalIncome(totalIncome);
     dashboardDTO.setTotalExpenseCount(totalExpenseCount);
     dashboardDTO.setTotalIncomeCount(totalIncomeCount);
-    dashboardDTO.setRecentExpenses(getExpenseDTOs(recentExpenses));
+    dashboardDTO.setRecentExpenses(recentExpenses);
+    dashboardDTO.setExpensePieDataItems(
+      calculatePieData(recentExpenses, categories, false)
+    );
+    dashboardDTO.setIncomePieDataItems(
+      calculatePieData(recentExpenses, categories, true)
+    );
     return dashboardDTO;
   }
 
@@ -173,53 +182,6 @@ public class ExpenseService {
       .and(ExpenseSpecification.withSearchTerm(filter.getSearchTerm()));
   }
 
-  private void calculateDateRange(ExpenseFilter filter) {
-    if (filter.getDuration() == null) {
-      filter.setDuration(ExpenseDuration.ALL_TIME);
-    }
-
-    LocalDate fromDate = filter.getFromDate();
-    LocalDate toDate = filter.getToDate();
-    switch (filter.getDuration()) {
-      case ALL_TIME:
-        fromDate = null;
-        toDate = null;
-        break;
-      case THIS_WEEK:
-        fromDate = LocalDate.now().with(DayOfWeek.MONDAY);
-        toDate = LocalDate.now().with(DayOfWeek.SUNDAY);
-        break;
-      case LAST_WEEK:
-        fromDate = LocalDate.now().minusWeeks(1).with(DayOfWeek.MONDAY);
-        toDate = LocalDate.now().with(DayOfWeek.SUNDAY);
-        break;
-      case THIS_MONTH:
-        fromDate = LocalDate.now().withDayOfMonth(1);
-        toDate = LocalDate.now().withDayOfMonth(
-          LocalDate.now().lengthOfMonth()
-        );
-        break;
-      case LAST_MONTH:
-        fromDate = LocalDate.now().minusMonths(1).withDayOfMonth(1);
-        toDate = LocalDate.now().withDayOfMonth(
-          LocalDate.now().lengthOfMonth()
-        );
-        break;
-      case THIS_YEAR:
-        fromDate = LocalDate.now().withDayOfYear(1);
-        toDate = LocalDate.now().withDayOfYear(LocalDate.now().lengthOfYear());
-        break;
-      case LAST_YEAR:
-        fromDate = LocalDate.now().minusYears(1).withDayOfYear(1);
-        toDate = LocalDate.now().withDayOfYear(LocalDate.now().lengthOfYear());
-        break;
-      case DATE_RANGE:
-        break;
-    }
-    filter.setFromDate(fromDate);
-    filter.setToDate(toDate);
-  }
-
   private List<ExpenseDTO> getExpenseDTOs(List<Expense> expenses) {
     if (expenses == null || expenses.isEmpty()) {
       return Collections.emptyList();
@@ -232,9 +194,7 @@ public class ExpenseService {
     expense.setAmount(expenseDTO.getAmount());
     expense.setTitle(expenseDTO.getTitle());
     expense.setDescription(expenseDTO.getDescription());
-    expenseSubCategoryRepository
-      .findById(expenseDTO.getSubCategoryId())
-      .ifPresent(expense::setSubCategory);
+    expenseCategoryService.getSubCategory(expenseDTO.getSubCategoryId());
     expense.setIncome(expenseDTO.isIncome());
     expense.setDateAdded(expenseDTO.getDateAdded());
     if (expenseDTO.getExpenseGroupId() != null) {
@@ -259,12 +219,12 @@ public class ExpenseService {
     );
   }
 
-  private ExpenseSummaryDTO toExpenseSummaryDTO(List<Expense> expenses) {
+  private ExpenseSummaryDTO toExpenseSummaryDTO(List<ExpenseDTO> expenses) {
     long totalExpensesCount = 0;
     long totalIncomeCount = 0;
     double totalExpensesAmount = 0.0;
     double totalIncomeAmount = 0.0;
-    for (Expense expense : expenses) {
+    for (ExpenseDTO expense : expenses) {
       if (expense.isIncome()) {
         totalIncomeCount++;
         totalIncomeAmount += expense.getAmount();
@@ -274,12 +234,17 @@ public class ExpenseService {
       }
     }
     double balanceAmount = totalIncomeAmount - totalExpensesAmount;
+    List<ExpenseCategoryDTO> categories =
+      expenseCategoryService.getAllCategories();
+
     return new ExpenseSummaryDTO(
       totalExpensesCount,
       totalIncomeCount,
       totalExpensesAmount,
       totalIncomeAmount,
-      balanceAmount
+      balanceAmount,
+      calculatePieData(expenses, categories, false),
+      calculatePieData(expenses, categories, true)
     );
   }
 
@@ -299,6 +264,9 @@ public class ExpenseService {
       }
     }
     double balanceAmount = totalIncomeAmount - totalExpensesAmount;
+    List<ExpenseCategoryDTO> categories =
+      expenseCategoryService.getAllCategories();
+
     return new ExpenseGroupDTO(
       expenseGroup.getId(),
       expenseGroup.getTitle(),
@@ -308,7 +276,9 @@ public class ExpenseService {
       totalExpensesAmount,
       totalIncomeAmount,
       balanceAmount,
-      expenseDTOs
+      expenseDTOs,
+      calculatePieData(expenseDTOs, categories, false),
+      calculatePieData(expenseDTOs, categories, true)
     );
   }
 
