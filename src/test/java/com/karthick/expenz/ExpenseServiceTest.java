@@ -9,10 +9,7 @@ import com.karthick.expenz.enums.ExpenseType;
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.expenses.dto.*;
-import com.karthick.expenz.expenses.entity.Expense;
-import com.karthick.expenz.expenses.entity.ExpenseCategory;
-import com.karthick.expenz.expenses.entity.ExpenseGroup;
-import com.karthick.expenz.expenses.entity.ExpenseSubCategory;
+import com.karthick.expenz.expenses.entity.*;
 import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
 import com.karthick.expenz.expenses.repository.ExpenseSubCategoryRepository;
@@ -32,6 +29,9 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
@@ -183,6 +183,33 @@ public class ExpenseServiceTest {
 
   @Test
   @SuppressWarnings("unchecked")
+  public void testFetchSummary() {
+    Expense mockExpense = getTestExpenseData();
+
+    Expense mockIncome = getTestExpenseData();
+    mockIncome.setId(2L);
+    mockIncome.setIncome(true);
+    mockIncome.setAmount(100_000.0);
+
+    ExpenseFilter filter = getTestExpenseFilterData();
+
+    when(expenseRepository.findAll(any(Specification.class))).thenReturn(
+      List.of(mockExpense, mockIncome)
+    );
+
+    ExpenseSummaryDTO validSummary = expenseService.fetchSummary(
+      filter,
+      mockExpense.getUser().getId()
+    );
+    assertEquals(1L, validSummary.totalExpensesCount());
+    assertEquals(1L, validSummary.totalIncomesCount());
+    assertEquals(50_000.0, validSummary.totalExpensesAmount(), 0.001);
+    assertEquals(100_000.0, validSummary.totalIncomesAmount(), 0.001);
+    assertEquals(50_000.0, validSummary.balanceAmount(), 0.001);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
   public void testFetchExpenses() {
     Expense mockExpense = getTestExpenseData();
 
@@ -192,22 +219,17 @@ public class ExpenseServiceTest {
     mockIncome.setAmount(100_000.0);
 
     ExpenseFilter filter = getTestExpenseFilterData();
-    when(expenseRepository.findAll(any(Specification.class))).thenReturn(
-      List.of(mockExpense, mockIncome)
-    );
+    when(
+      expenseRepository.findAll(any(Specification.class), any(Pageable.class))
+    ).thenReturn(new PageImpl<>(List.of(mockExpense, mockIncome)));
 
-    ExpenseListDTO validExpenses = expenseService.fetchExpenses(
+    Page<ExpenseDTO> validExpenses = expenseService.fetchExpenses(
       filter,
       mockExpense.getUser().getId()
     );
-    assertEquals(2, validExpenses.expenses().size());
-    assertEquals(1L, validExpenses.totalExpensesCount());
-    assertEquals(1L, validExpenses.totalIncomesCount());
-    assertEquals(50_000.0, validExpenses.totalExpensesAmount(), 0.001);
-    assertEquals(100_000.0, validExpenses.totalIncomesAmount(), 0.001);
-    assertEquals(50_000.0, validExpenses.balanceAmount(), 0.001);
-    assertExpenseEqualsDTO(mockExpense, validExpenses.expenses().get(0));
-    assertExpenseEqualsDTO(mockIncome, validExpenses.expenses().get(1));
+    assertEquals(2, validExpenses.getContent().size());
+    assertExpenseEqualsDTO(mockExpense, validExpenses.getContent().get(0));
+    assertExpenseEqualsDTO(mockIncome, validExpenses.getContent().get(1));
   }
 
   @ParameterizedTest
@@ -223,24 +245,24 @@ public class ExpenseServiceTest {
       filter.setToDate(LocalDate.now());
     }
 
-    when(expenseRepository.findAll(any(Specification.class))).thenReturn(
-      List.of(mockExpense)
-    );
+    when(
+      expenseRepository.findAll(any(Specification.class), any(Pageable.class))
+    ).thenReturn(new PageImpl<>(List.of(mockExpense)));
 
-    ExpenseListDTO validExpenses = expenseService.fetchExpenses(
+    Page<ExpenseDTO> validExpenses = expenseService.fetchExpenses(
       filter,
       mockExpense.getUser().getId()
     );
-    assertEquals(1, validExpenses.expenses().size());
+    assertEquals(1, validExpenses.getContent().size());
   }
 
   @Test
   @SuppressWarnings("unchecked")
   public void testFetchExpenses_ExceptionThrowsBadRequestException() {
     ExpenseFilter filter = getTestExpenseFilterData();
-    when(expenseRepository.findAll(any(Specification.class))).thenThrow(
-      new RuntimeException("Database error")
-    );
+    when(
+      expenseRepository.findAll(any(Specification.class), any(Pageable.class))
+    ).thenThrow(new RuntimeException("Database error"));
 
     assertThrows(BadRequestException.class, () ->
       expenseService.fetchExpenses(filter, 1L)
@@ -460,7 +482,9 @@ public class ExpenseServiceTest {
 
     when(expenseRepository.getTotalExpenses(userId, false)).thenReturn(0.0);
     when(expenseRepository.getTotalExpenses(userId, true)).thenReturn(0.0);
-    when(expenseRepository.countByIncomeAndUserId(false, userId)).thenReturn(0L);
+    when(expenseRepository.countByIncomeAndUserId(false, userId)).thenReturn(
+      0L
+    );
     when(expenseRepository.countByIncomeAndUserId(true, userId)).thenReturn(0L);
     when(expenseRepository.getRecentExpenses(userId)).thenReturn(null);
 
@@ -603,4 +627,3 @@ public class ExpenseServiceTest {
     );
   }
 }
-
