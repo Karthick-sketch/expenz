@@ -2,6 +2,7 @@ package com.karthick.expenz;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.karthick.expenz.enums.ExpenseDuration;
@@ -15,6 +16,7 @@ import com.karthick.expenz.expenses.repository.ExpenseRepository;
 import com.karthick.expenz.expenses.repository.ExpenseSubCategoryRepository;
 import com.karthick.expenz.expenses.service.ExpenseService;
 import com.karthick.expenz.filter.ExpenseFilter;
+import com.karthick.expenz.filter.ExpenseGroupFilter;
 import com.karthick.expenz.users.entity.User;
 import com.karthick.expenz.users.service.UserService;
 import java.time.LocalDate;
@@ -555,9 +557,9 @@ public class ExpenseServiceTest {
     ExpenseGroup mockGroup = getTestExpenseGroupData();
     long userId = mockExpense.getUser().getId();
 
-    when(expenseGroupRepository.findByUserId(userId)).thenReturn(
-      List.of(mockGroup)
-    );
+    when(
+      expenseGroupRepository.findByUserId(eq(userId), any(Pageable.class))
+    ).thenReturn(new PageImpl<>(List.of(mockGroup)));
     when(
       expenseRepository.countTotalExpensesInGroup(false, mockGroup.getId())
     ).thenReturn(3L);
@@ -571,12 +573,13 @@ public class ExpenseServiceTest {
       expenseRepository.getTotalExpensesInGroup(mockGroup.getId(), true)
     ).thenReturn(200_000.0);
 
-    List<ExpenseGroupListDTO> groups = expenseService.fetchExpenseGroups(
+    Page<ExpenseGroupListDTO> groups = expenseService.fetchExpenseGroups(
+      new ExpenseGroupFilter(),
       userId
     );
 
-    assertEquals(1, groups.size());
-    ExpenseGroupListDTO dto = groups.get(0);
+    assertEquals(1, groups.getTotalElements());
+    ExpenseGroupListDTO dto = groups.getContent().get(0);
     assertEquals(mockGroup.getId(), dto.id());
     assertEquals(mockGroup.getTitle(), dto.title());
     assertEquals(3L, dto.expenseCount());

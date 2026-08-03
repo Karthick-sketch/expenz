@@ -12,6 +12,7 @@ import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
 import com.karthick.expenz.expenses.specification.ExpenseSpecification;
 import com.karthick.expenz.filter.ExpenseFilter;
+import com.karthick.expenz.filter.ExpenseGroupFilter;
 import com.karthick.expenz.users.service.UserService;
 import java.util.Collections;
 import java.util.List;
@@ -146,12 +147,13 @@ public class ExpenseService {
     }
   }
 
-  public List<ExpenseGroupListDTO> fetchExpenseGroups(long userId) {
+  public Page<ExpenseGroupListDTO> fetchExpenseGroups(
+    ExpenseGroupFilter filter,
+    long userId
+  ) {
     return expenseGroupRepository
-      .findByUserId(userId)
-      .stream()
-      .map(this::toExpenseGroupListDTO)
-      .toList();
+      .findByUserId(userId, PageRequest.of(filter.getPage(), filter.getSize()))
+      .map(this::toExpenseGroupListDTO);
   }
 
   public ExpenseGroupDTO fetchExpenseGroupDTO(long id, long userId) {

@@ -5,6 +5,7 @@ import com.karthick.expenz.expenses.dto.*;
 import com.karthick.expenz.expenses.dto.category.*;
 import com.karthick.expenz.expenses.service.*;
 import com.karthick.expenz.filter.ExpenseFilter;
+import com.karthick.expenz.filter.ExpenseGroupFilter;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,16 @@ public class ExpenseController {
   ) {
     return new ResponseEntity<>(
       expenseService.fetchSummary(filter, userId()),
+      HttpStatus.OK
+    );
+  }
+
+  @PostMapping("/query/groups")
+  public ResponseEntity<Page<ExpenseGroupListDTO>> getExpenseGroups(
+    @RequestBody ExpenseGroupFilter filter
+  ) {
+    return new ResponseEntity<>(
+      expenseService.fetchExpenseGroups(filter, userId()),
       HttpStatus.OK
     );
   }
@@ -101,14 +112,6 @@ public class ExpenseController {
     return new ResponseEntity<>(
       expenseService.createExpenseGroup(expenseGroupCreateDTO, userId()),
       HttpStatus.CREATED
-    );
-  }
-
-  @GetMapping("/groups")
-  public ResponseEntity<List<ExpenseGroupListDTO>> getExpenseGroups() {
-    return new ResponseEntity<>(
-      expenseService.fetchExpenseGroups(userId()),
-      HttpStatus.OK
     );
   }
 
