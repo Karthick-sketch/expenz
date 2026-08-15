@@ -130,7 +130,7 @@ public class ExpenseServiceTest {
         assertEquals(expense.getCategoryId(), dto.getCategoryId());
       }
     }
-    assertEquals(expense.isIncome(), dto.isIncome());
+    assertEquals(expense.getIncome(), dto.getIncome());
     assertEquals(expense.getDateAdded(), dto.getDateAdded());
     assertEquals(expense.getExpenseGroupId(), dto.getExpenseGroupId());
   }
@@ -367,7 +367,7 @@ public class ExpenseServiceTest {
       mockExpense.getDescription(),
       mockExpense.getCategoryId(),
       mockExpense.getSubCategory().getId(),
-      mockExpense.isIncome(),
+      mockExpense.getIncome(),
       mockExpense.getDateAdded(),
       mockExpense.getExpenseGroupId()
     );
@@ -410,7 +410,7 @@ public class ExpenseServiceTest {
       mockExpense.getDescription(),
       mockExpense.getCategoryId(),
       mockExpense.getSubCategory().getId(),
-      mockExpense.isIncome(),
+      mockExpense.getIncome(),
       mockExpense.getDateAdded(),
       mockExpense.getExpenseGroupId()
     );

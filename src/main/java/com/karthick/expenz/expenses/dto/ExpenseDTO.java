@@ -13,12 +13,14 @@ import lombok.Setter;
 public class ExpenseDTO {
 
   private Long id;
-  private double amount;
+  private Double amount;
+  private String currencyCode;
+  private Double conversionRate;
   private String title;
   private String description;
   private Long categoryId;
   private Long subCategoryId;
-  private boolean income;
+  private Boolean income;
   private LocalDate dateAdded;
   private Long expenseGroupId;
 }

@@ -195,7 +195,7 @@ public class ExpenseService {
     expense.setTitle(expenseDTO.getTitle());
     expense.setDescription(expenseDTO.getDescription());
     expenseCategoryService.getSubCategory(expenseDTO.getSubCategoryId());
-    expense.setIncome(expenseDTO.isIncome());
+    expense.setIncome(expenseDTO.getIncome());
     expense.setDateAdded(expenseDTO.getDateAdded());
     if (expenseDTO.getExpenseGroupId() != null) {
       expense.setExpenseGroup(
@@ -209,11 +209,13 @@ public class ExpenseService {
     return new ExpenseDTO(
       expense.getId(),
       expense.getAmount(),
+      expense.getCurrencyCode(),
+      expense.getConversionRate(),
       expense.getTitle(),
       expense.getDescription(),
       expense.getCategoryId(),
       expense.getSubCategory().getId(),
-      expense.isIncome(),
+      expense.getIncome(),
       expense.getDateAdded(),
       expense.getExpenseGroupId()
     );
@@ -225,7 +227,7 @@ public class ExpenseService {
     double totalExpensesAmount = 0.0;
     double totalIncomeAmount = 0.0;
     for (ExpenseDTO expense : expenses) {
-      if (expense.isIncome()) {
+      if (expense.getIncome()) {
         totalIncomeCount++;
         totalIncomeAmount += expense.getAmount();
       } else {
@@ -255,7 +257,7 @@ public class ExpenseService {
     double totalExpensesAmount = 0.0;
     double totalIncomeAmount = 0.0;
     for (ExpenseDTO expenseDTO : expenseDTOs) {
-      if (expenseDTO.isIncome()) {
+      if (expenseDTO.getIncome()) {
         totalIncomeCount++;
         totalIncomeAmount += expenseDTO.getAmount();
       } else {

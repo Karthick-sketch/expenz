@@ -26,7 +26,7 @@ public class ExpenseUtils {
         .filter(cat -> cat.getId() == exp.getCategoryId())
         .findFirst();
       category.ifPresent(cat -> {
-        if (exp.isIncome() == income) {
+        if (exp.getIncome() == income) {
           Optional<PieDataItem> existingCategory = pieDataItems
             .stream()
             .filter(item -> item.getName() == cat.getName())

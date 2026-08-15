@@ -15,10 +15,16 @@ public class Expense implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+  private Long id;
 
   @Column(name = "amount", nullable = false)
-  private double amount;
+  private Double amount;
+
+  @Column(name = "currency_code", nullable = false)
+  private String currencyCode;
+
+  @Column(name = "conversion_rate")
+  private Double conversionRate;
 
   @Column(name = "title", nullable = false)
   private String title;
@@ -31,7 +37,7 @@ public class Expense implements Serializable {
   private ExpenseSubCategory subCategory;
 
   @Column(name = "is_income", nullable = false)
-  private boolean income;
+  private Boolean income;
 
   @Column(name = "date_added", nullable = false)
   private LocalDate dateAdded;

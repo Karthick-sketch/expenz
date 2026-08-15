@@ -1,6 +1,7 @@
 package com.karthick.expenz.users.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.karthick.expenz.currency.entity.CurrencyConversionRate;
 import com.karthick.expenz.expenses.entity.Expense;
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -41,4 +42,8 @@ public class User implements Serializable {
   @JsonIgnore
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
   private List<Expense> expenses;
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+  private List<CurrencyConversionRate> currencyConversionRates;
 }
