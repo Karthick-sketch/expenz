@@ -78,4 +78,11 @@ public class ExpenseSpecification {
       );
     };
   }
+
+  public static Specification<Expense> orderByDateAddedDesc() {
+    return (root, query, cb) -> {
+      query.orderBy(cb.desc(root.get("dateAdded")));
+      return cb.conjunction();
+    };
+  }
 }

@@ -71,7 +71,7 @@ VALUES
             LIMIT 1
         ),
         false,
-        '2026-07-01',
+        '2026-08-01',
         (
             SELECT id
             FROM users
@@ -98,7 +98,7 @@ VALUES
             LIMIT 1
         ),
         false,
-        '2026-07-02',
+        '2026-08-02',
         (
             SELECT id
             FROM users
@@ -125,7 +125,7 @@ VALUES
             LIMIT 1
         ),
         false,
-        '2026-07-03',
+        '2026-08-03',
         (
             SELECT id
             FROM users
@@ -152,7 +152,7 @@ VALUES
             LIMIT 1
         ),
         false,
-        '2026-07-04',
+        '2026-08-04',
         (
             SELECT id
             FROM users
@@ -179,7 +179,7 @@ VALUES
             LIMIT 1
         ),
         false,
-        '2026-07-05',
+        '2026-08-05',
         (
             SELECT id
             FROM users
@@ -208,7 +208,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-02',
+    '2026-08-02',
     (
         SELECT id
         FROM users
@@ -235,7 +235,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-04',
+    '2026-08-04',
     (
         SELECT id
         FROM users
@@ -262,7 +262,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-06',
+    '2026-08-06',
     (
         SELECT id
         FROM users
@@ -289,7 +289,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-08',
+    '2026-08-08',
     (
         SELECT id
         FROM users
@@ -316,7 +316,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-10',
+    '2026-08-10',
     (
         SELECT id
         FROM users
@@ -345,7 +345,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-01',
+    '2026-08-01',
     (
         SELECT id
         FROM users
@@ -372,7 +372,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-03',
+    '2026-08-03',
     (
         SELECT id
         FROM users
@@ -399,7 +399,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-05',
+    '2026-08-05',
     (
         SELECT id
         FROM users
@@ -426,7 +426,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-08',
+    '2026-08-08',
     (
         SELECT id
         FROM users
@@ -453,7 +453,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-12',
+    '2026-08-12',
     (
         SELECT id
         FROM users
@@ -482,7 +482,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-05',
+    '2026-08-05',
     (
         SELECT id
         FROM users
@@ -509,7 +509,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-06',
+    '2026-08-06',
     (
         SELECT id
         FROM users
@@ -536,7 +536,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-10',
+    '2026-08-10',
     (
         SELECT id
         FROM users
@@ -563,7 +563,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-12',
+    '2026-08-12',
     (
         SELECT id
         FROM users
@@ -590,7 +590,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-15',
+    '2026-08-15',
     (
         SELECT id
         FROM users
@@ -619,7 +619,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-01',
+    '2026-08-01',
     (
         SELECT id
         FROM users
@@ -646,7 +646,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-04',
+    '2026-08-04',
     (
         SELECT id
         FROM users
@@ -673,7 +673,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-08',
+    '2026-08-08',
     (
         SELECT id
         FROM users
@@ -700,7 +700,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-11',
+    '2026-08-11',
     (
         SELECT id
         FROM users
@@ -727,7 +727,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-14',
+    '2026-08-14',
     (
         SELECT id
         FROM users
@@ -756,7 +756,7 @@ VALUES
         LIMIT 1
     ),
     true,
-    '2026-07-01',
+    '2026-08-01',
     (
         SELECT id
         FROM users
@@ -777,7 +777,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-07',
+    '2026-08-07',
     (
         SELECT id
         FROM users
@@ -798,7 +798,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-09',
+    '2026-08-09',
     (
         SELECT id
         FROM users
@@ -819,7 +819,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-12',
+    '2026-08-12',
     (
         SELECT id
         FROM users
@@ -840,7 +840,7 @@ VALUES
         LIMIT 1
     ),
     false,
-    '2026-07-16',
+    '2026-08-16',
     (
         SELECT id
         FROM users

@@ -178,7 +178,8 @@ public class ExpenseService {
       .and(ExpenseSpecification.withToDate(filter.getToDate()))
       .and(ExpenseSpecification.withCategory(filter.getCategoryId()))
       .and(ExpenseSpecification.withSubCategory(filter.getSubCategoryId()))
-      .and(ExpenseSpecification.withSearchTerm(filter.getSearchTerm()));
+      .and(ExpenseSpecification.withSearchTerm(filter.getSearchTerm()))
+      .and(ExpenseSpecification.orderByDateAddedDesc());
   }
 
   private List<ExpenseDTO> getExpenseDTOs(List<Expense> expenses) {
