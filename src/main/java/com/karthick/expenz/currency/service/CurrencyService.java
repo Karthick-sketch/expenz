@@ -6,6 +6,7 @@ import com.karthick.expenz.currency.repository.CurrencyConversionRateRepository;
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.users.service.UserService;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -106,6 +107,7 @@ public class CurrencyService {
       currencyConversionRateDTO.fromCurrency(),
       currencyConversionRateDTO.toCurrency(),
       currencyConversionRateDTO.rate(),
+      LocalDate.now(),
       userService.findUser(userId)
     );
   }

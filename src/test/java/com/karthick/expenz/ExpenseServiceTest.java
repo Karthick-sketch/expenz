@@ -13,12 +13,13 @@ import com.karthick.expenz.expenses.dto.*;
 import com.karthick.expenz.expenses.entity.*;
 import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
-import com.karthick.expenz.expenses.repository.ExpenseSubCategoryRepository;
+import com.karthick.expenz.expenses.service.ExpenseCategoryService;
 import com.karthick.expenz.expenses.service.ExpenseService;
 import com.karthick.expenz.filter.ExpenseFilter;
 import com.karthick.expenz.filter.ExpenseGroupFilter;
 import com.karthick.expenz.users.entity.User;
 import com.karthick.expenz.users.service.UserService;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +47,7 @@ public class ExpenseServiceTest {
   private ExpenseGroupRepository expenseGroupRepository;
 
   @Mock
-  private ExpenseSubCategoryRepository expenseSubCategoryRepository;
+  private ExpenseCategoryService expenseCategoryService;
 
   @Mock
   private UserService userService;
@@ -67,7 +68,7 @@ public class ExpenseServiceTest {
   private Expense getTestExpenseData() {
     Expense expense = new Expense();
     expense.setId(1L);
-    expense.setAmount(50_000.0);
+    expense.setAmount(BigDecimal.valueOf(50_000.0));
 
     ExpenseCategory category = new ExpenseCategory();
     category.setId(1L);
@@ -99,7 +100,7 @@ public class ExpenseServiceTest {
   private ExpenseDTO getTestExpenseDTOData() {
     ExpenseDTO dto = new ExpenseDTO();
     dto.setId(1L);
-    dto.setAmount(50_000.0);
+    dto.setAmount(BigDecimal.valueOf(50_000.0));
     dto.setCategoryId(1L);
     dto.setSubCategoryId(1L);
     dto.setIncome(false);
@@ -121,7 +122,7 @@ public class ExpenseServiceTest {
 
   private void assertExpenseEqualsDTO(Expense expense, ExpenseDTO dto) {
     assertEquals(expense.getId(), dto.getId());
-    assertEquals(expense.getAmount(), dto.getAmount(), 0.001);
+    assertEquals(expense.getAmount(), dto.getAmount());
     assertEquals(expense.getTitle(), dto.getTitle());
     assertEquals(expense.getDescription(), dto.getDescription());
     if (expense.getSubCategory() != null) {
@@ -191,7 +192,7 @@ public class ExpenseServiceTest {
     Expense mockIncome = getTestExpenseData();
     mockIncome.setId(2L);
     mockIncome.setIncome(true);
-    mockIncome.setAmount(100_000.0);
+    mockIncome.setAmount(BigDecimal.valueOf(100_000.0));
 
     ExpenseFilter filter = getTestExpenseFilterData();
 
@@ -205,9 +206,9 @@ public class ExpenseServiceTest {
     );
     assertEquals(1L, validSummary.totalExpensesCount());
     assertEquals(1L, validSummary.totalIncomesCount());
-    assertEquals(50_000.0, validSummary.totalExpensesAmount(), 0.001);
-    assertEquals(100_000.0, validSummary.totalIncomesAmount(), 0.001);
-    assertEquals(50_000.0, validSummary.balanceAmount(), 0.001);
+    assertEquals(BigDecimal.valueOf(50_000.0), validSummary.totalExpensesAmount());
+    assertEquals(BigDecimal.valueOf(100_000.0), validSummary.totalIncomesAmount());
+    assertEquals(BigDecimal.valueOf(50_000.0), validSummary.balanceAmount());
   }
 
   @Test
@@ -218,7 +219,7 @@ public class ExpenseServiceTest {
     Expense mockIncome = getTestExpenseData();
     mockIncome.setId(2L);
     mockIncome.setIncome(true);
-    mockIncome.setAmount(100_000.0);
+    mockIncome.setAmount(BigDecimal.valueOf(100_000.0));
 
     ExpenseFilter filter = getTestExpenseFilterData();
     when(
@@ -284,8 +285,8 @@ public class ExpenseServiceTest {
       Optional.of(mockExpense.getExpenseGroup())
     );
     when(
-      expenseSubCategoryRepository.findById(mockExpenseDTO.getSubCategoryId())
-    ).thenReturn(Optional.of(mockExpense.getSubCategory()));
+      expenseCategoryService.getSubCategory(mockExpenseDTO.getSubCategoryId())
+    ).thenReturn(mockExpense.getSubCategory());
 
     ExpenseDTO expense = expenseService.createExpense(
       mockExpenseDTO,
@@ -308,8 +309,8 @@ public class ExpenseServiceTest {
     );
     when(expenseRepository.save(any(Expense.class))).thenReturn(mockExpense);
     when(
-      expenseSubCategoryRepository.findById(mockExpenseDTO.getSubCategoryId())
-    ).thenReturn(Optional.of(mockExpense.getSubCategory()));
+      expenseCategoryService.getSubCategory(mockExpenseDTO.getSubCategoryId())
+    ).thenReturn(mockExpense.getSubCategory());
 
     ExpenseDTO expense = expenseService.createExpense(
       mockExpenseDTO,
@@ -333,8 +334,8 @@ public class ExpenseServiceTest {
       Optional.of(mockExpense.getExpenseGroup())
     );
     when(
-      expenseSubCategoryRepository.findById(mockExpenseDTO.getSubCategoryId())
-    ).thenReturn(Optional.of(mockExpense.getSubCategory()));
+      expenseCategoryService.getSubCategory(mockExpenseDTO.getSubCategoryId())
+    ).thenReturn(mockExpense.getSubCategory());
     when(expenseRepository.save(any(Expense.class))).thenThrow(
       new RuntimeException("Database error")
     );
@@ -357,12 +358,12 @@ public class ExpenseServiceTest {
       )
     ).thenReturn(Optional.of(mockExpense));
     when(expenseRepository.save(mockExpense)).thenReturn(mockExpense);
-    when(expenseSubCategoryRepository.findById(any())).thenReturn(
-      Optional.of(mockExpense.getSubCategory())
+    when(expenseCategoryService.getSubCategory(any())).thenReturn(
+      mockExpense.getSubCategory()
     );
 
     ExpenseUpdateDTO updatedFields = new ExpenseUpdateDTO(
-      45_000.0,
+      BigDecimal.valueOf(45_000.0),
       mockExpense.getTitle(),
       mockExpense.getDescription(),
       mockExpense.getCategoryId(),
@@ -385,7 +386,7 @@ public class ExpenseServiceTest {
     Executable wrongUserId = () ->
       expenseService.updateExpense(mockExpense.getId(), updatedFields, 2L);
 
-    assertEquals(45_000.0, validExpense.getAmount(), 0.001);
+    assertEquals(BigDecimal.valueOf(45_000.0), validExpense.getAmount());
     assertThrows(EntityNotFoundException.class, wrongId);
     assertThrows(EntityNotFoundException.class, wrongUserId);
     verify(expenseRepository, times(1)).save(mockExpense);
@@ -405,7 +406,7 @@ public class ExpenseServiceTest {
     );
 
     ExpenseUpdateDTO updatedFields = new ExpenseUpdateDTO(
-      45_000.0,
+      BigDecimal.valueOf(45_000.0),
       mockExpense.getTitle(),
       mockExpense.getDescription(),
       mockExpense.getCategoryId(),
@@ -595,7 +596,7 @@ public class ExpenseServiceTest {
     Expense mockIncome = getTestExpenseData();
     mockIncome.setId(2L);
     mockIncome.setIncome(true);
-    mockIncome.setAmount(100_000.0);
+    mockIncome.setAmount(BigDecimal.valueOf(100_000.0));
 
     ExpenseGroup mockGroup = getTestExpenseGroupData();
     mockGroup.setExpenses(List.of(mockExpense, mockIncome));
@@ -614,9 +615,9 @@ public class ExpenseServiceTest {
     assertEquals(mockGroup.getTitle(), result.title());
     assertEquals(1L, result.totalExpensesCount());
     assertEquals(1L, result.totalIncomesCount());
-    assertEquals(mockExpense.getAmount(), result.totalExpensesAmount(), 0.001);
-    assertEquals(100_000.0, result.totalIncomesAmount(), 0.001);
-    assertEquals(50_000.0, result.balanceAmount(), 0.001);
+    assertEquals(mockExpense.getAmount(), result.totalExpensesAmount());
+    assertEquals(BigDecimal.valueOf(100_000.0), result.totalIncomesAmount());
+    assertEquals(BigDecimal.valueOf(50_000.0), result.balanceAmount());
   }
 
   @Test

@@ -14,6 +14,7 @@ import com.karthick.expenz.expenses.specification.ExpenseSpecification;
 import com.karthick.expenz.filter.ExpenseFilter;
 import com.karthick.expenz.filter.ExpenseGroupFilter;
 import com.karthick.expenz.users.service.UserService;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -224,18 +225,18 @@ public class ExpenseService {
   private ExpenseSummaryDTO toExpenseSummaryDTO(List<ExpenseDTO> expenses) {
     long totalExpensesCount = 0;
     long totalIncomeCount = 0;
-    double totalExpensesAmount = 0.0;
-    double totalIncomeAmount = 0.0;
+    BigDecimal totalExpensesAmount = BigDecimal.ZERO;
+    BigDecimal totalIncomeAmount = BigDecimal.ZERO;
     for (ExpenseDTO expense : expenses) {
       if (expense.getIncome()) {
         totalIncomeCount++;
-        totalIncomeAmount += expense.getAmount();
+        totalIncomeAmount = totalIncomeAmount.add(expense.getAmount());
       } else {
         totalExpensesCount++;
-        totalExpensesAmount += expense.getAmount();
+        totalExpensesAmount = totalExpensesAmount.add(expense.getAmount());
       }
     }
-    double balanceAmount = totalIncomeAmount - totalExpensesAmount;
+    BigDecimal balanceAmount = totalIncomeAmount.subtract(totalExpensesAmount);
     List<ExpenseCategoryDTO> categories =
       expenseCategoryService.getAllCategories();
 
@@ -254,18 +255,18 @@ public class ExpenseService {
     List<ExpenseDTO> expenseDTOs = getExpenseDTOs(expenseGroup.getExpenses());
     long totalExpensesCount = 0;
     long totalIncomeCount = 0;
-    double totalExpensesAmount = 0.0;
-    double totalIncomeAmount = 0.0;
+    BigDecimal totalExpensesAmount = BigDecimal.ZERO;
+    BigDecimal totalIncomeAmount = BigDecimal.ZERO;
     for (ExpenseDTO expenseDTO : expenseDTOs) {
       if (expenseDTO.getIncome()) {
         totalIncomeCount++;
-        totalIncomeAmount += expenseDTO.getAmount();
+        totalIncomeAmount = totalIncomeAmount.add(expenseDTO.getAmount());
       } else {
         totalExpensesCount++;
-        totalExpensesAmount += expenseDTO.getAmount();
+        totalExpensesAmount = totalExpensesAmount.add(expenseDTO.getAmount());
       }
     }
-    double balanceAmount = totalIncomeAmount - totalExpensesAmount;
+    BigDecimal balanceAmount = totalIncomeAmount.subtract(totalExpensesAmount);
     List<ExpenseCategoryDTO> categories =
       expenseCategoryService.getAllCategories();
 

@@ -1,3 +1,7 @@
+DROP SCHEMA public CASCADE;
+
+CREATE SCHEMA public;
+
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -9,15 +13,15 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS expense_categories (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255),
-    icon VARCHAR(255),
-    color_hex CHAR(7)
+    name VARCHAR(255) NOT NULL UNIQUE,
+    icon VARCHAR(255) NOT NULL,
+    color_hex VARCHAR(7) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS expense_sub_categories (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255),
-    icon VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
+    icon VARCHAR(255) NOT NULL,
     category_id BIGINT NOT NULL,
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES expense_categories (id)
 );
@@ -26,23 +30,37 @@ CREATE TABLE IF NOT EXISTS expense_groups (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    user_id BIGINT,
+    user_id BIGINT NOT NULL,
     CONSTRAINT fk_group_user FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS expenses (
     id BIGSERIAL PRIMARY KEY,
-    amount DOUBLE PRECISION NOT NULL,
     title VARCHAR(255) NOT NULL,
     description VARCHAR(255),
+    amount NUMERIC(12, 2) NOT NULL,
+    currency_code VARCHAR(3) NOT NULL,
+    conversion_rate NUMERIC(18, 8) NOT NULL DEFAULT 1,
     sub_category_id BIGINT,
     is_income BOOLEAN NOT NULL,
     date_added DATE NOT NULL,
     user_id BIGINT NOT NULL,
     expense_group_id BIGINT,
+    CONSTRAINT chk_conversion_rate_positive CHECK (conversion_rate > 0),
     CONSTRAINT fk_expense_sub_category FOREIGN KEY (sub_category_id) REFERENCES expense_sub_categories (id),
     CONSTRAINT fk_expense_user FOREIGN KEY (user_id) REFERENCES users (id),
     CONSTRAINT fk_expense_group FOREIGN KEY (expense_group_id) REFERENCES expense_groups (id)
+);
+
+CREATE TABLE currency_conversion_rates (
+    id BIGSERIAL PRIMARY KEY,
+    from_currency VARCHAR(3) NOT NULL,
+    to_currency VARCHAR(3) NOT NULL,
+    rate NUMERIC(18, 8) NOT NULL,
+    last_updated DATE NOT NULL,
+    user_id BIGINT NOT NULL,
+    CONSTRAINT chk_rate_positive CHECK (rate > 0),
+    CONSTRAINT fk_conversion_user FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 -- Categories

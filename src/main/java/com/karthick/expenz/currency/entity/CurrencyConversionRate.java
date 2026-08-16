@@ -1,13 +1,9 @@
 package com.karthick.expenz.currency.entity;
 
 import com.karthick.expenz.users.entity.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -25,13 +21,20 @@ public class CurrencyConversionRate {
   private Long id;
 
   @NonNull
+  @Column(name = "from_currency")
   private String fromCurrency;
 
   @NonNull
+  @Column(name = "to_currency")
   private String toCurrency;
 
   @NonNull
-  private Double rate;
+  @Column(name = "rate")
+  private BigDecimal rate;
+
+  @NonNull
+  @Column(name = "last_updated")
+  private LocalDate lastUpdated;
 
   @NonNull
   @ManyToOne

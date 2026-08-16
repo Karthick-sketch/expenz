@@ -33,7 +33,7 @@ public class ExpenseUtils {
             .findFirst();
           if (existingCategory.isPresent()) {
             PieDataItem ec = existingCategory.get();
-            ec.setValue(ec.getValue() + exp.getAmount());
+            ec.setValue(ec.getValue().add(exp.getAmount()));
           } else {
             pieDataItems.add(
               new PieDataItem(cat.getName(), exp.getAmount(), cat.getColorHex())

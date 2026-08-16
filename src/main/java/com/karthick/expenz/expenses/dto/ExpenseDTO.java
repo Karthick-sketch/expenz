@@ -1,5 +1,6 @@
 package com.karthick.expenz.expenses.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,9 +14,9 @@ import lombok.Setter;
 public class ExpenseDTO {
 
   private Long id;
-  private Double amount;
+  private BigDecimal amount;
   private String currencyCode;
-  private Double conversionRate;
+  private BigDecimal conversionRate;
   private String title;
   private String description;
   private Long categoryId;

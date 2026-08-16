@@ -3,6 +3,7 @@ package com.karthick.expenz.expenses.entity;
 import com.karthick.expenz.users.entity.User;
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,13 +19,13 @@ public class Expense implements Serializable {
   private Long id;
 
   @Column(name = "amount", nullable = false)
-  private Double amount;
+  private BigDecimal amount;
 
   @Column(name = "currency_code", nullable = false)
   private String currencyCode;
 
   @Column(name = "conversion_rate")
-  private Double conversionRate;
+  private BigDecimal conversionRate;
 
   @Column(name = "title", nullable = false)
   private String title;

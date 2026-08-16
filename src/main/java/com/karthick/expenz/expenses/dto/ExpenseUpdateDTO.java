@@ -1,14 +1,15 @@
 package com.karthick.expenz.expenses.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ExpenseUpdateDTO(
-  double amount,
+  BigDecimal amount,
   String title,
   String description,
   Long categoryId,
   Long subCategoryId,
-  boolean income,
+  Boolean income,
   LocalDate dateAdded,
   Long expenseGroupId
 ) {}

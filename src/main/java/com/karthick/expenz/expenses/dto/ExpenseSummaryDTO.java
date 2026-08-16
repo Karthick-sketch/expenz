@@ -1,13 +1,14 @@
 package com.karthick.expenz.expenses.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record ExpenseSummaryDTO(
-  long totalExpensesCount,
-  long totalIncomesCount,
-  double totalExpensesAmount,
-  double totalIncomesAmount,
-  double balanceAmount,
+  Long totalExpensesCount,
+  Long totalIncomesCount,
+  BigDecimal totalExpensesAmount,
+  BigDecimal totalIncomesAmount,
+  BigDecimal balanceAmount,
   List<PieDataItem> expensePieDataItems,
   List<PieDataItem> incomePieDataItems
 ) {}
