@@ -59,6 +59,10 @@ public class ExpenseCategoryService {
       );
   }
 
+  public ExpenseSubCategoryDTO getSubCategoryDTO(Long id) {
+    return toExpenseSubCategoryDTO(getSubCategory(id));
+  }
+
   public ExpenseSubCategoryDTO createSubCategory(
     ExpenseSubCategoryCreateDTO subCategoryCreateDTO
   ) {

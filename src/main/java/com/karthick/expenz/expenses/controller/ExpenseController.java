@@ -105,6 +105,14 @@ public class ExpenseController {
     );
   }
 
+  @GetMapping("/groups/all")
+  public ResponseEntity<List<ExpenseGroupListDTO>> getAllExpenseGroups() {
+    return new ResponseEntity<>(
+      expenseService.fetchAllExpenseGroups(userId()),
+      HttpStatus.OK
+    );
+  }
+
   @PostMapping("/groups")
   public ResponseEntity<ExpenseGroupDTO> createNewExpenseGroup(
     @RequestBody ExpenseGroupCreateDTO expenseGroupCreateDTO
@@ -149,6 +157,16 @@ public class ExpenseController {
   ) {
     return new ResponseEntity<>(
       expenseCategoryService.getAllSubCategories(id),
+      HttpStatus.OK
+    );
+  }
+
+  @GetMapping("/sub-categories/{id}")
+  public ResponseEntity<ExpenseSubCategoryDTO> getSubCategoryById(
+    @PathVariable("id") Long id
+  ) {
+    return new ResponseEntity<>(
+      expenseCategoryService.getSubCategoryDTO(id),
       HttpStatus.OK
     );
   }

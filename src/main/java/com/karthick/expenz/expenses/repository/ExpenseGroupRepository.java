@@ -1,6 +1,7 @@
 package com.karthick.expenz.expenses.repository;
 
 import com.karthick.expenz.expenses.entity.ExpenseGroup;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,4 +15,6 @@ public interface ExpenseGroupRepository
   Optional<ExpenseGroup> findByIdAndUserId(long id, long userId);
 
   Page<ExpenseGroup> findByUserId(long userId, Pageable pageable);
+
+  List<ExpenseGroup> findAllByUserId(long userId);
 }

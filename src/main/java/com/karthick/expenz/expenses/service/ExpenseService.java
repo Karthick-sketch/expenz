@@ -157,6 +157,14 @@ public class ExpenseService {
       .map(this::toExpenseGroupListDTO);
   }
 
+  public List<ExpenseGroupListDTO> fetchAllExpenseGroups(long userId) {
+    return expenseGroupRepository
+      .findAllByUserId(userId)
+      .stream()
+      .map(this::toExpenseGroupListDTO)
+      .toList();
+  }
+
   public ExpenseGroupDTO fetchExpenseGroupDTO(long id, long userId) {
     return toExpenseGroupDTO(
       expenseGroupRepository
