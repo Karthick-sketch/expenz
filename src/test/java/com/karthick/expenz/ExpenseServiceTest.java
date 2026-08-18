@@ -630,4 +630,74 @@ public class ExpenseServiceTest {
       expenseService.fetchExpenseGroupDTO(99L, 1L)
     );
   }
+
+  @Test
+  public void testFetchAllExpenseGroups() {
+    Expense mockExpense = getTestExpenseData();
+    ExpenseGroup mockGroup = getTestExpenseGroupData();
+    long userId = mockExpense.getUser().getId();
+
+    when(expenseGroupRepository.findAllByUserId(userId))
+      .thenReturn(List.of(mockGroup));
+    when(
+      expenseRepository.countTotalExpensesInGroup(false, mockGroup.getId())
+    ).thenReturn(2L);
+    when(
+      expenseRepository.countTotalExpensesInGroup(true, mockGroup.getId())
+    ).thenReturn(1L);
+    when(
+      expenseRepository.getTotalExpensesInGroup(mockGroup.getId(), false)
+    ).thenReturn(75_000.0);
+    when(
+      expenseRepository.getTotalExpensesInGroup(mockGroup.getId(), true)
+    ).thenReturn(100_000.0);
+
+    List<ExpenseGroupListDTO> groups =
+      expenseService.fetchAllExpenseGroups(userId);
+
+    assertEquals(1, groups.size());
+    ExpenseGroupListDTO dto = groups.get(0);
+    assertEquals(mockGroup.getId(), dto.id());
+    assertEquals(mockGroup.getTitle(), dto.title());
+    assertEquals(2L, dto.expenseCount());
+    assertEquals(1L, dto.incomeCount());
+    assertEquals(75_000.0, dto.totalExpensesAmount(), 0.001);
+    assertEquals(100_000.0, dto.totalIncomesAmount(), 0.001);
+    assertEquals(25_000.0, dto.balanceAmount(), 0.001);
+  }
+
+  @Test
+  public void testFetchAllExpenseGroups_Empty() {
+    long userId = 1L;
+    when(expenseGroupRepository.findAllByUserId(userId)).thenReturn(List.of());
+
+    List<ExpenseGroupListDTO> groups = expenseService.fetchAllExpenseGroups(userId);
+
+    assertNotNull(groups);
+    assertTrue(groups.isEmpty());
+  }
+
+  @Test
+  public void testFetchExpenseGroupDTO_WithEmptyExpenses() {
+    ExpenseGroup mockGroup = getTestExpenseGroupData();
+    mockGroup.setExpenses(List.of());
+    long userId = 1L;
+
+    when(
+      expenseGroupRepository.findByIdAndUserId(mockGroup.getId(), userId)
+    ).thenReturn(Optional.of(mockGroup));
+    when(expenseCategoryService.getAllCategories()).thenReturn(List.of());
+
+    ExpenseGroupDTO result = expenseService.fetchExpenseGroupDTO(
+      mockGroup.getId(),
+      userId
+    );
+
+    assertEquals(mockGroup.getId(), result.id());
+    assertEquals(0L, result.totalExpensesCount());
+    assertEquals(0L, result.totalIncomesCount());
+    assertEquals(BigDecimal.ZERO, result.totalExpensesAmount());
+    assertEquals(BigDecimal.ZERO, result.totalIncomesAmount());
+    assertEquals(BigDecimal.ZERO, result.balanceAmount());
+  }
 }

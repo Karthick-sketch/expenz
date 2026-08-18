@@ -137,13 +137,11 @@ public class ExpenseCategoryServiceTest {
     sub2.setIcon("restaurant-icon");
     sub2.setCategory(getTestCategory());
 
-    when(expenseSubCategoryRepository.findByCategoryId(1L)).thenReturn(
+    when(expenseSubCategoryRepository.findAll()).thenReturn(
       List.of(sub1, sub2)
     );
 
-    List<ExpenseSubCategoryDTO> result = expenseCategoryService.getAllSubCategories(
-      1L
-    );
+    List<ExpenseSubCategoryDTO> result = expenseCategoryService.getAllSubCategories();
 
     assertEquals(2, result.size());
     assertEquals(sub1.getId(), result.get(0).getId());
@@ -155,13 +153,9 @@ public class ExpenseCategoryServiceTest {
 
   @Test
   public void testGetAllSubCategories_Empty() {
-    when(expenseSubCategoryRepository.findByCategoryId(1L)).thenReturn(
-      List.of()
-    );
+    when(expenseSubCategoryRepository.findAll()).thenReturn(List.of());
 
-    List<ExpenseSubCategoryDTO> result = expenseCategoryService.getAllSubCategories(
-      1L
-    );
+    List<ExpenseSubCategoryDTO> result = expenseCategoryService.getAllSubCategories();
 
     assertTrue(result.isEmpty());
   }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.users.dto.UserCreateDTO;
 import com.karthick.expenz.users.dto.UserDTO;
@@ -172,5 +173,45 @@ public class UserServiceTest {
     assertEquals(mockUser.getName(), dto.getName());
     assertEquals(mockUser.getEmail(), dto.getEmail());
     assertThrows(EntityNotFoundException.class, wrongEmail);
+  }
+
+  @Test
+  public void testCreateUser_ExceptionThrowsBadRequestException() {
+    UserCreateDTO mockUserCreateDTO = getTestUserCreateDTOData();
+
+    when(passwordEncoder.encode(mockUserCreateDTO.getPassword())).thenReturn(
+      "encoded"
+    );
+    when(userRepository.save(any(User.class))).thenThrow(
+      new RuntimeException("Constraint violation")
+    );
+
+    assertThrows(BadRequestException.class, () ->
+      userService.createUser(mockUserCreateDTO)
+    );
+    verify(userRepository, times(1)).save(any(User.class));
+  }
+
+  @Test
+  public void testUpdateUser_ExceptionThrowsBadRequestException() {
+    User mockUser = getTestUserData();
+    when(userRepository.findById(mockUser.getId())).thenReturn(
+      Optional.of(mockUser)
+    );
+    when(passwordEncoder.encode(any())).thenReturn("encoded");
+    when(userRepository.save(mockUser)).thenThrow(
+      new RuntimeException("Constraint violation")
+    );
+
+    UserUpdateDTO updatedFields = new UserUpdateDTO(
+      mockUser.getName(),
+      "newemail@marvel.com",
+      "newpassword",
+      "USD"
+    );
+
+    assertThrows(BadRequestException.class, () ->
+      userService.updateUser(mockUser.getId(), updatedFields)
+    );
   }
 }
