@@ -7,6 +7,8 @@ import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.users.service.UserService;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,31 +37,26 @@ public class CurrencyService {
     }
   }
 
-  public CurrencyConversionRate findCurrencyConversionRateById(
-    long id,
+  public List<CurrencyConversionRateDTO> getCurrencyConversionRates(
     long userId
   ) {
     return currencyConversionRateRepository
-      .findByIdAndUserId(id, userId)
-      .orElseThrow(() ->
-        new EntityNotFoundException("Currency conversion rate not found")
-      );
+      .findByUserId(userId)
+      .stream()
+      .map(this::toCurrencyConversionRateDTO)
+      .toList();
   }
 
-  public CurrencyConversionRate findCurrencyConversionRate(
+  public Optional<CurrencyConversionRate> findCurrencyConversionRate(
     String fromCurrency,
     String toCurrency,
     long userId
   ) {
-    return currencyConversionRateRepository
-      .findByFromCurrencyAndToCurrencyAndUserId(
-        fromCurrency,
-        toCurrency,
-        userId
-      )
-      .orElseThrow(() ->
-        new EntityNotFoundException("Currency conversion rate not found")
-      );
+    return currencyConversionRateRepository.findByFromCurrencyAndToCurrencyAndUserId(
+      fromCurrency,
+      toCurrency,
+      userId
+    );
   }
 
   public CurrencyConversionRateDTO getCurrencyConversionRate(
@@ -69,30 +66,39 @@ public class CurrencyService {
   ) {
     try {
       return toCurrencyConversionRateDTO(
-        findCurrencyConversionRate(fromCurrency, toCurrency, userId)
+        findCurrencyConversionRate(
+          fromCurrency,
+          toCurrency,
+          userId
+        ).orElseThrow(() ->
+          new EntityNotFoundException("Currency conversion rate not found")
+        )
       );
     } catch (EntityNotFoundException ex) {
       throw new BadRequestException(ex.getMessage());
     }
   }
 
-  public CurrencyConversionRateDTO updateCurrencyConversionRate(
-    long id,
+  public CurrencyConversionRateDTO upsertCurrencyConversionRate(
     CurrencyConversionRateDTO currencyConversionRateDTO,
     long userId
   ) {
-    CurrencyConversionRate currencyConversionRate =
-      findCurrencyConversionRateById(id, userId);
-    currencyConversionRate.setFromCurrency(
-      currencyConversionRateDTO.fromCurrency()
+    Optional<CurrencyConversionRate> rateOptional = findCurrencyConversionRate(
+      currencyConversionRateDTO.fromCurrency(),
+      currencyConversionRateDTO.toCurrency(),
+      userId
     );
-    currencyConversionRate.setToCurrency(
-      currencyConversionRateDTO.toCurrency()
-    );
-    currencyConversionRate.setRate(currencyConversionRateDTO.rate());
+
+    if (rateOptional.isEmpty()) {
+      return createCurrencyConversionRate(currencyConversionRateDTO, userId);
+    }
+
+    CurrencyConversionRate conversionRate = rateOptional.get();
+    conversionRate.setRate(currencyConversionRateDTO.rate());
+    conversionRate.setLastUpdated(LocalDate.now());
     try {
       return toCurrencyConversionRateDTO(
-        currencyConversionRateRepository.save(currencyConversionRate)
+        currencyConversionRateRepository.save(conversionRate)
       );
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());

@@ -3,13 +3,14 @@ package com.karthick.expenz.currency.controller;
 import com.karthick.expenz.auth.UserSession;
 import com.karthick.expenz.currency.dto.*;
 import com.karthick.expenz.currency.service.CurrencyService;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/currencies")
+@RequestMapping("/api/currencies")
 @AllArgsConstructor
 public class CurrencyController {
 
@@ -35,27 +36,20 @@ public class CurrencyController {
   }
 
   @GetMapping("/conversion-rates")
-  public ResponseEntity<CurrencyConversionRateDTO> getCurrencyConversionRate(
-    @RequestBody CurrencyConversionDTO currencyConversionDTO
-  ) {
-    return new ResponseEntity<>(
-      currencyService.getCurrencyConversionRate(
-        currencyConversionDTO.fromCurrency(),
-        currencyConversionDTO.toCurrency(),
-        userId()
-      ),
-      HttpStatus.OK
+  public ResponseEntity<
+    List<CurrencyConversionRateDTO>
+  > getAllCurrencyConversionRates() {
+    return ResponseEntity.ok(
+      currencyService.getCurrencyConversionRates(userId())
     );
   }
 
-  @PatchMapping("/conversion-rates/{id}")
+  @PatchMapping("/conversion-rates")
   public ResponseEntity<CurrencyConversionRateDTO> updateCurrencyConversionRate(
-    @PathVariable long id,
     @RequestBody CurrencyConversionRateDTO currencyConversionRateDTO
   ) {
     return new ResponseEntity<>(
-      currencyService.updateCurrencyConversionRate(
-        id,
+      currencyService.upsertCurrencyConversionRate(
         currencyConversionRateDTO,
         userId()
       ),

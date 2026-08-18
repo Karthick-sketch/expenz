@@ -85,7 +85,9 @@ public class ExpenseService {
     expense.setAmount(updatedExpense.amount());
     expense.setTitle(updatedExpense.title());
     expense.setDescription(updatedExpense.description());
-    expenseCategoryService.getSubCategory(updatedExpense.subCategoryId());
+    expense.setSubCategory(
+      expenseCategoryService.getSubCategory(updatedExpense.subCategoryId())
+    );
     expense.setIncome(updatedExpense.income());
     expense.setDateAdded(updatedExpense.dateAdded());
     try {
@@ -201,9 +203,13 @@ public class ExpenseService {
   private Expense toExpense(ExpenseDTO expenseDTO) {
     Expense expense = new Expense();
     expense.setAmount(expenseDTO.getAmount());
+    expense.setCurrencyCode(expenseDTO.getCurrencyCode());
+    expense.setConversionRate(expenseDTO.getConversionRate());
     expense.setTitle(expenseDTO.getTitle());
     expense.setDescription(expenseDTO.getDescription());
-    expenseCategoryService.getSubCategory(expenseDTO.getSubCategoryId());
+    expense.setSubCategory(
+      expenseCategoryService.getSubCategory(expenseDTO.getSubCategoryId())
+    );
     expense.setIncome(expenseDTO.getIncome());
     expense.setDateAdded(expenseDTO.getDateAdded());
     if (expenseDTO.getExpenseGroupId() != null) {

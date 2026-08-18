@@ -151,22 +151,10 @@ public class ExpenseController {
     );
   }
 
-  @GetMapping("/categories/{id}/sub-categories")
-  public ResponseEntity<List<ExpenseSubCategoryDTO>> getSubCategoryById(
-    @PathVariable("id") long id
-  ) {
+  @GetMapping("/sub-categories")
+  public ResponseEntity<List<ExpenseSubCategoryDTO>> getSubCategories() {
     return new ResponseEntity<>(
-      expenseCategoryService.getAllSubCategories(id),
-      HttpStatus.OK
-    );
-  }
-
-  @GetMapping("/sub-categories/{id}")
-  public ResponseEntity<ExpenseSubCategoryDTO> getSubCategoryById(
-    @PathVariable("id") Long id
-  ) {
-    return new ResponseEntity<>(
-      expenseCategoryService.getSubCategoryDTO(id),
+      expenseCategoryService.getAllSubCategories(),
       HttpStatus.OK
     );
   }

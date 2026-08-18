@@ -43,9 +43,9 @@ public class ExpenseCategoryService {
     return toExpenseCategoryDTO(category);
   }
 
-  public List<ExpenseSubCategoryDTO> getAllSubCategories(Long categoryId) {
+  public List<ExpenseSubCategoryDTO> getAllSubCategories() {
     return expenseSubCategoryRepository
-      .findByCategoryId(categoryId)
+      .findAll()
       .stream()
       .map(this::toExpenseSubCategoryDTO)
       .toList();
@@ -57,10 +57,6 @@ public class ExpenseCategoryService {
       .orElseThrow(() ->
         new EntityNotFoundException(id, ExpenseSubCategory.class)
       );
-  }
-
-  public ExpenseSubCategoryDTO getSubCategoryDTO(Long id) {
-    return toExpenseSubCategoryDTO(getSubCategory(id));
   }
 
   public ExpenseSubCategoryDTO createSubCategory(
