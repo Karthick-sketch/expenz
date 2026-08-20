@@ -10,6 +10,9 @@ import com.karthick.expenz.enums.ExpenseType;
 import com.karthick.expenz.exception.BadRequestException;
 import com.karthick.expenz.exception.EntityNotFoundException;
 import com.karthick.expenz.expenses.dto.*;
+import com.karthick.expenz.expenses.dto.group.ExpenseGroupCreateDTO;
+import com.karthick.expenz.expenses.dto.group.ExpenseGroupDTO;
+import com.karthick.expenz.expenses.dto.group.ExpenseGroupListDTO;
 import com.karthick.expenz.expenses.entity.*;
 import com.karthick.expenz.expenses.repository.ExpenseGroupRepository;
 import com.karthick.expenz.expenses.repository.ExpenseRepository;
@@ -206,8 +209,14 @@ public class ExpenseServiceTest {
     );
     assertEquals(1L, validSummary.totalExpensesCount());
     assertEquals(1L, validSummary.totalIncomesCount());
-    assertEquals(BigDecimal.valueOf(50_000.0), validSummary.totalExpensesAmount());
-    assertEquals(BigDecimal.valueOf(100_000.0), validSummary.totalIncomesAmount());
+    assertEquals(
+      BigDecimal.valueOf(50_000.0),
+      validSummary.totalExpensesAmount()
+    );
+    assertEquals(
+      BigDecimal.valueOf(100_000.0),
+      validSummary.totalIncomesAmount()
+    );
     assertEquals(BigDecimal.valueOf(50_000.0), validSummary.balanceAmount());
   }
 
@@ -637,8 +646,9 @@ public class ExpenseServiceTest {
     ExpenseGroup mockGroup = getTestExpenseGroupData();
     long userId = mockExpense.getUser().getId();
 
-    when(expenseGroupRepository.findAllByUserId(userId))
-      .thenReturn(List.of(mockGroup));
+    when(expenseGroupRepository.findAllByUserId(userId)).thenReturn(
+      List.of(mockGroup)
+    );
     when(
       expenseRepository.countTotalExpensesInGroup(false, mockGroup.getId())
     ).thenReturn(2L);
@@ -652,8 +662,9 @@ public class ExpenseServiceTest {
       expenseRepository.getTotalExpensesInGroup(mockGroup.getId(), true)
     ).thenReturn(100_000.0);
 
-    List<ExpenseGroupListDTO> groups =
-      expenseService.fetchAllExpenseGroups(userId);
+    List<ExpenseGroupListDTO> groups = expenseService.fetchAllExpenseGroups(
+      userId
+    );
 
     assertEquals(1, groups.size());
     ExpenseGroupListDTO dto = groups.get(0);
@@ -671,7 +682,9 @@ public class ExpenseServiceTest {
     long userId = 1L;
     when(expenseGroupRepository.findAllByUserId(userId)).thenReturn(List.of());
 
-    List<ExpenseGroupListDTO> groups = expenseService.fetchAllExpenseGroups(userId);
+    List<ExpenseGroupListDTO> groups = expenseService.fetchAllExpenseGroups(
+      userId
+    );
 
     assertNotNull(groups);
     assertTrue(groups.isEmpty());

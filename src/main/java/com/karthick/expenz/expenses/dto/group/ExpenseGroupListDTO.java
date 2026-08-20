@@ -1,4 +1,4 @@
-package com.karthick.expenz.expenses.dto;
+package com.karthick.expenz.expenses.dto.group;
 
 public record ExpenseGroupListDTO(
   long id,
